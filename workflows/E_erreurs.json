@@ -1,0 +1,75 @@
+{
+  "name": "CL — E · Erreurs",
+  "nodes": [
+    {
+      "id": "1f32c5ce-5cd1-579c-b60f-21160d178ae3",
+      "name": "Erreur dans un workflow CL",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4622e4a7-3d6a-5d72-9897-97730acf16b8",
+      "name": "Préparer la trace",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Unhandled failure in a CL workflow: write a trace (no notification is sent).\nconst e = $input.first().json;\nconst id = e.execution?.id || 'unknown';\nconst trace = {\n  workflow: e.workflow?.name, execution_id: id, last_node: e.execution?.lastNodeExecuted,\n  message: e.execution?.error?.message, at: new Date().toISOString(),\n};\nconst path = `/home/node/.n8n-files/cafe-lumen/_errors/workflow_${id}.json`;\nreturn [{ json: { path, ...trace }, binary: { data: {\n  data: Buffer.from(JSON.stringify(trace, null, 2), 'utf8').toString('base64'),\n  mimeType: 'application/json', fileName: path.split('/').pop() } } }];"
+      }
+    },
+    {
+      "id": "4c5dc7c8-eec6-5206-a4c3-c68ca57c5709",
+      "name": "Écrire la trace",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $json.path }}",
+        "dataPropertyName": "data",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Erreur dans un workflow CL": {
+      "main": [
+        [
+          {
+            "node": "Préparer la trace",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Préparer la trace": {
+      "main": [
+        [
+          {
+            "node": "Écrire la trace",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "note": "Demo portfolio Café Lumen (fictive). No credentials included. Set the data table ID and the error workflow after import."
+  }
+}

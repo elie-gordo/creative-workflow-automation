@@ -1,0 +1,14 @@
+{
+  "brand": "Café Lumen (fictive)",
+  "week_id": "2026-W43",
+  "date": "2026-10-22",
+  "angle": "question",
+  "status": "needs_review",
+  "mode": "mock",
+  "attempts": 2,
+  "similar_hook": "18 h : le chiffre clé de la semaine chez Café Lumen",
+  "review_url": "https://n8n.example.com/form-waiting/548?signature=REDACTED",
+  "execution_id": "548",
+  "generated_at": "2026-10-15T22:01:12.999Z",
+  "prompt_version": "v1"
+}

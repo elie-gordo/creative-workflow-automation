@@ -1,0 +1,14 @@
+{
+  "brand": "Café Lumen (fictive)",
+  "week_id": "2026-W43",
+  "date": "2026-10-20",
+  "angle": "astuce",
+  "status": "to_review",
+  "mode": "mock",
+  "attempts": 2,
+  "similar_hook": null,
+  "review_url": "https://n8n.example.com/form-waiting/546?signature=REDACTED",
+  "execution_id": "546",
+  "generated_at": "2026-10-15T22:01:09.342Z",
+  "prompt_version": "v1"
+}

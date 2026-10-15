@@ -1,0 +1,429 @@
+{
+  "name": "CL — A · Planifier la semaine",
+  "nodes": [
+    {
+      "id": "af6e8b34-43b4-5a4c-993a-8347970a42e9",
+      "name": "Formulaire : idée de la semaine",
+      "webhookId": "51ca8155-be44-560b-a2ae-8f0677dc6c68",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "formTitle": "Café Lumen — idée de la semaine",
+        "formDescription": "Démo portfolio, marque fictive. Une idée → 5 jours de posts LinkedIn + Instagram à valider.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Semaine (lundi)",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Thème de la semaine",
+              "placeholder": "Lancement du cold brew d'automne",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Message clé",
+              "fieldType": "textarea",
+              "placeholder": "Infusé 18 h, sans sucre ajouté",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Produit mis en avant (optionnel)",
+              "placeholder": "Cold Brew Lumen 25 cl"
+            },
+            {
+              "fieldLabel": "Ton",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "chaleureux"
+                  },
+                  {
+                    "option": "direct"
+                  },
+                  {
+                    "option": "expert"
+                  },
+                  {
+                    "option": "ludique"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Appel à l'action (optionnel)",
+              "placeholder": "Disponible en boutique"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "path": "cl-brief"
+        }
+      }
+    },
+    {
+      "id": "7004e29c-f85f-5f0a-b76a-cd36c79a0e23",
+      "name": "Valider le brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const ANGLES = ['chiffre', 'astuce', 'coulisses', 'question', 'produit'];\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\n// Normalise the form submission and validate it against the brief rules.\nconst TONES = ['chaleureux', 'direct', 'expert', 'ludique'];\nconst f = $input.first().json;\nconst pick = (...keys) => {\n  for (const k of keys) if (f[k] !== undefined && f[k] !== null) return String(f[k]).trim();\n  return '';\n};\nconst brief = {\n  week_start: pick('Semaine (lundi)', 'week_start'),\n  theme: pick('Thème de la semaine', 'theme'),\n  key_message: pick('Message clé', 'key_message'),\n  product: pick('Produit mis en avant (optionnel)', 'product'),\n  tone: pick('Ton', 'tone').toLowerCase(),\n  cta: pick(\"Appel à l'action (optionnel)\", 'cta'),\n};\n\nconst errors = [];\nconst checkLength = (value, min, max, label, required) => {\n  if (!value) { if (required) errors.push(`${label} : obligatoire`); return; }\n  if (value.length < min || value.length > max) errors.push(`${label} : ${min} à ${max} caractères (actuel : ${value.length})`);\n};\n\nfunction isoWeek(d) {\n  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));\n  const day = t.getUTCDay() || 7;\n  t.setUTCDate(t.getUTCDate() + 4 - day);\n  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));\n  const w = Math.ceil(((t - y0) / 86400000 + 1) / 7);\n  return `${t.getUTCFullYear()}-W${String(w).padStart(2, '0')}`;\n}\n\nlet weekId = '';\nconst m = /^(\\d{4})-(\\d{2})-(\\d{2})/.exec(brief.week_start);\nif (!m) {\n  errors.push('Semaine : date au format AAAA-MM-JJ obligatoire');\n} else {\n  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));\n  if (isNaN(d) || d.getUTCDay() !== 1) errors.push('Semaine : la date doit être un lundi');\n  else { brief.week_start = d.toISOString().slice(0, 10); weekId = isoWeek(d); }\n}\ncheckLength(brief.theme, 10, 120, 'Thème', true);\ncheckLength(brief.key_message, 10, 200, 'Message clé', true);\ncheckLength(brief.product, 0, 80, 'Produit', false);\ncheckLength(brief.cta, 0, 40, \"Appel à l'action\", false);\nif (!TONES.includes(brief.tone)) errors.push(`Ton : valeur attendue parmi ${TONES.join(', ')}`);\n\nreturn [{ json: { valid: errors.length === 0, errors, brief, week_id: weekId } }];"
+      }
+    },
+    {
+      "id": "7155a67f-8fca-5589-a3f6-34617aa505bd",
+      "name": "Semaine déjà planifiée ?",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "mode": "id",
+          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "week_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.week_id || '__none__' }}"
+            }
+          ]
+        },
+        "returnAll": true
+      }
+    },
+    {
+      "id": "01778949-f3bf-500a-b3b7-cad8d7291a07",
+      "name": "Construire le plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const ANGLES = ['chiffre', 'astuce', 'coulisses', 'question', 'produit'];\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\n// Refuse an already-planned week, otherwise build the 5 daily slots (one angle per day).\nconst v = $('Valider le brief').first().json;\nconst existing = $input.all().filter((i) => i.json && i.json.id);\nconst errors = [...v.errors];\nif (v.valid && existing.length) errors.push(`Semaine ${v.week_id} déjà planifiée (${existing.length} créneaux)`);\nif (errors.length) return [{ json: { ok: false, errors, message: errors.map((e) => '• ' + e).join('\\n') } }];\n\nconst start = new Date(v.brief.week_start + 'T00:00:00Z');\nconst now = new Date().toISOString();\nreturn ANGLES.map((angle, i) => {\n  const d = new Date(start);\n  d.setUTCDate(d.getUTCDate() + i);\n  return { json: { ok: true, week_id: v.week_id, date: d.toISOString().slice(0, 10), day_index: i + 1, angle,\n    ...v.brief, status: 'planned', updated_at: now } };\n});"
+      }
+    },
+    {
+      "id": "ddc82353-e343-526c-9082-95508996c834",
+      "name": "Plan valide ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b7182d99-fed1-58ef-b29a-cf7e16dd2659",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "541f5a92-572a-5875-8927-475e196d76ee",
+      "name": "Enregistrer les créneaux",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        200
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "mode": "id",
+          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "week_id": "={{ $json.week_id }}",
+            "date": "={{ $json.date }}",
+            "day_index": "={{ $json.day_index }}",
+            "angle": "={{ $json.angle }}",
+            "theme": "={{ $json.theme }}",
+            "key_message": "={{ $json.key_message }}",
+            "product": "={{ $json.product }}",
+            "tone": "={{ $json.tone }}",
+            "cta": "={{ $json.cta }}",
+            "status": "={{ $json.status }}",
+            "updated_at": "={{ $json.updated_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "week_id",
+              "displayName": "week_id",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "day_index",
+              "displayName": "day_index",
+              "type": "number",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "angle",
+              "displayName": "angle",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "key_message",
+              "displayName": "key_message",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "product",
+              "displayName": "product",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "tone",
+              "displayName": "tone",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "49c78ee0-21b2-5a23-ad72-d4abc41cc762",
+      "name": "Page : plan créé",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "executeOnce": true,
+      "position": [
+        1320,
+        200
+      ],
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Plan créé",
+        "completionMessage": "=5 créneaux planifiés pour la semaine {{ $('Construire le plan').first().json.week_id }}. Les posts seront produits chaque jour ouvré et soumis à validation.",
+        "options": {}
+      },
+      "webhookId": "67387609-790b-4eee-a748-0a0107577380"
+    },
+    {
+      "id": "7ed01ca3-b9c7-5f4c-8b4c-434fed131816",
+      "name": "Page : brief refusé",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        420
+      ],
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Brief refusé",
+        "completionMessage": "={{ $json.message }}",
+        "options": {}
+      },
+      "webhookId": "c4677712-6885-402f-bac8-ee0406f5ca4a"
+    }
+  ],
+  "connections": {
+    "Formulaire : idée de la semaine": {
+      "main": [
+        [
+          {
+            "node": "Valider le brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valider le brief": {
+      "main": [
+        [
+          {
+            "node": "Semaine déjà planifiée ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Semaine déjà planifiée ?": {
+      "main": [
+        [
+          {
+            "node": "Construire le plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construire le plan": {
+      "main": [
+        [
+          {
+            "node": "Plan valide ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan valide ?": {
+      "main": [
+        [
+          {
+            "node": "Enregistrer les créneaux",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Page : brief refusé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enregistrer les créneaux": {
+      "main": [
+        [
+          {
+            "node": "Page : plan créé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "note": "Demo portfolio Café Lumen (fictive). No credentials included. Set the data table ID and the error workflow after import."
+  }
+}

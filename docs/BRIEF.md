@@ -73,6 +73,8 @@ La variété vient d'abord de la **structure** (angles), ensuite de l'IA.
 
 ## 7. Résultat attendu
 
+> Écart à la réalisation : le nœud d'écriture de n8n ne crée pas de dossiers. Les sorties sont donc rangées dans 4 dossiers fixes, avec la semaine, le jour et l'angle dans le nom de fichier (ex. `output/2026-W43_1-lun_chiffre_linkedin.md`). Les réponses simulées sont intégrées au workflow plutôt que dans `fixtures/`.
+
 ```
 output/
 └── 2026-W43_cafe-lumen/

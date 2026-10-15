@@ -14,3 +14,7 @@ __pycache__/
 .n8n/
 *.sqlite
 *.log
+
+# local script state / outputs
+scripts/.n8n-state.json
+scripts/out/

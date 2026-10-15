@@ -1,0 +1,81 @@
+{
+  "name": "CL — T · Inspecter les sorties (lecture seule)",
+  "nodes": [
+    {
+      "id": "52ed827f-acc8-5269-8965-7189eb69fee6",
+      "name": "Webhook : inspecter",
+      "webhookId": "5fd02aa1-0245-5868-9190-1bd459b9f01c",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "cl-inspect",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "c5270736-2613-5a7f-8c83-09d0d6d04258",
+      "name": "Lire les sorties",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "/home/node/.n8n-files/cafe-lumen/**/*",
+        "options": {}
+      }
+    },
+    {
+      "id": "0ae0e838-b640-5d65-8e1d-8c02b4b3b194",
+      "name": "Lister",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// List generated files (read-only) so outputs can be checked without disk access.\nconst files = [];\nfor (let i = 0; i < $input.all().length; i++) {\n  const item = $input.all()[i];\n  const b = item.binary?.data;\n  if (!b) continue;\n  const buf = await this.helpers.getBinaryDataBuffer(i, 'data');\n  const text = buf.toString('utf8');\n  files.push({ path: `${b.directory || ''}/${b.fileName}`, bytes: buf.length,\n    content: /svg|json|markdown|text/.test(b.mimeType || b.fileName) ? text : null });\n}\nfiles.sort((a, b) => a.path.localeCompare(b.path));\nreturn [{ json: { count: files.length, files } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook : inspecter": {
+      "main": [
+        [
+          {
+            "node": "Lire les sorties",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire les sorties": {
+      "main": [
+        [
+          {
+            "node": "Lister",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "note": "Demo portfolio Café Lumen (fictive). No credentials included. Set the data table ID and the error workflow after import."
+  }
+}

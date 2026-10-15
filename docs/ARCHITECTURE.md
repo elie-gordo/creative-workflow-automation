@@ -1,6 +1,13 @@
 # Architecture et faisabilité gratuite (étape 3)
 
-> Statut : **proposition — en attente de validation**. Rien n'est déployé, aucun compte créé.
+> Statut : **étude réalisée le 2026-10-15 — décision prise, voir ci-dessous.**
+
+## Décision retenue (2026-10-15)
+
+- **Hébergement** : n8n auto-hébergé sur un serveur personnel existant (Docker, n8n 2.43.6), accessible uniquement par réseau privé **Tailscale**, avec HTTPS fourni par `tailscale serve`. Pas de domaine, pas de cloud public, 0 € supplémentaire.
+- **IA** : mode **mock** par défaut ; mode **live** via l'API **OpenAI** (`gpt-4o-mini`) avec une credential n8n, pas encore activé.
+- **Stockage** : Data table n8n `cl_slots` (planning, statuts, textes) et fichiers sous `~/.n8n-files/cafe-lumen/`.
+- Les options comparées ci-dessous (Oracle, Google Cloud, n8n Cloud, Groq, Gemini, Mistral) restent documentées pour qui veut reproduire la démo sans serveur personnel.
 > Vérifications faites le 2026-10-15 sur les sources officielles listées en bas. Les offres gratuites peuvent changer sans préavis.
 > Légende : ✅ vérifié (source officielle) · ⚠️ vérifié mais ambigu / contradictoire · ❓ non vérifié
 
