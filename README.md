@@ -4,7 +4,11 @@
 
 Une idée saisie le lundi devient, chaque jour ouvré, un post LinkedIn et un post Instagram avec visuel. Chaque post est contrôlé automatiquement, puis **validé par un humain** avant d'être déposé dans une boîte d'envoi simulée.
 
-![Visuel généré pour le lundi de la semaine de démonstration](docs/img/2026-W43_1-lun_chiffre_instagram_1080x1350.png)
+![Schéma du pipeline](docs/img/workflow-diagram.png)
+
+![Workflow B dans n8n : étape IA, contrôles, nouvel essai et chemin d'erreur](docs/img/canvas-B-detail.png)
+
+<img src="docs/img/2026-W43_1-lun_chiffre_instagram_1080x1350.png" width="260" alt="Visuel généré (lundi, chiffre clé)"> <img src="docs/img/2026-W43_5-ven_produit_instagram_1080x1350.png" width="260" alt="Visuel généré (vendredi, produit)">
 
 ## Fonctionnement
 

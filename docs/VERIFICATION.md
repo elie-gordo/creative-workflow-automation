@@ -31,8 +31,7 @@ Recherche dans tout le dépôt (hors `.git`) des motifs : jeton n8n (`eyJhbGci`)
 | Élément | Raison |
 |---|---|
 | Mode `live` (OpenAI) | aucune credential configurée pour l'instant ; le nœud HTTP et le schéma JSON n'ont été qu'inspectés |
-| Workflow E (exception non gérée) | aucune panne imprévue provoquée ; les erreurs prévues passent par le chemin d'erreur de B (testé) |
+| Workflow E (exception non gérée) | aucune panne imprévue provoquée ; les erreurs prévues passent par le chemin d'erreur de B (testé). E n'est pas « publié » dans n8n 2.x : à confirmer qu'un workflow d'erreur non publié se déclenche bien |
 | Déclencheur planifié 8 h | volontairement désactivé ; testé uniquement par le webhook à date forcée |
 | Rendu dans un vrai navigateur des formulaires | soumis par HTTP (multipart) ; seule la page de fin de A a été lue en HTML |
 | Import manuel des JSON exportés dans une instance vierge | déploiement fait par l'API ; l'import par l'interface n'a pas été rejoué |
-| Captures d'écran du canevas n8n | à faire (nécessite une session dans l'éditeur) |

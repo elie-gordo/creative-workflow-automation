@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1B3A4B"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B5462E"/></marker>
+    <style>
+      .box{fill:#fff;stroke:#1B3A4B;stroke-width:2}
+      .ai{fill:#F2A541;stroke:#1B3A4B;stroke-width:2}
+      .hum{fill:#1B3A4B}
+      .t{font-size:19px;fill:#1B3A4B;font-weight:700}
+      .s{font-size:14px;fill:#4A5A63}
+      .tw{font-size:19px;fill:#F6EFE6;font-weight:700}
+      .sw{font-size:14px;fill:#F6EFE6;fill-opacity:.85}
+      .lane{font-size:13px;letter-spacing:4px;font-weight:700;fill:#B07A2A}
+      .ln{stroke:#1B3A4B;stroke-width:2;fill:none;marker-end:url(#a)}
+      .er{stroke:#B5462E;stroke-width:2;fill:none;stroke-dasharray:6 5;marker-end:url(#r)}
+      .et{font-size:13px;fill:#B5462E}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#F6EFE6"/>
+  <text x="60" y="70" font-family="Georgia, serif" font-size="38" font-weight="700" fill="#1B3A4B">Café Lumen — pipeline éditorial n8n</text>
+  <text x="60" y="102" class="s">Marque fictive · 1 idée par semaine → 5 jours × (LinkedIn + Instagram) · validation humaine obligatoire</text>
+
+  <!-- Lane A -->
+  <text x="60" y="160" class="lane">A · PLANIFIER LA SEMAINE (lundi)</text>
+  <rect x="60" y="180" width="230" height="80" rx="10" class="box"/><text x="80" y="214" class="t">Formulaire</text><text x="80" y="238" class="s">idée, message, ton</text>
+  <rect x="340" y="180" width="230" height="80" rx="10" class="box"/><text x="360" y="214" class="t">Valider le brief</text><text x="360" y="238" class="s">règles + semaine en double</text>
+  <rect x="620" y="180" width="260" height="80" rx="10" class="box"/><text x="640" y="214" class="t">5 créneaux</text><text x="640" y="238" class="s">1 angle / jour → Data table</text>
+  <path d="M290 220H336" class="ln"/><path d="M570 220H616" class="ln"/>
+  <path d="M455 260V300" class="er"/><text x="470" y="296" class="et">invalide → page d'erreurs</text>
+
+  <!-- Lane B -->
+  <text x="60" y="370" class="lane">B · PRODUIRE LE JOUR (lun–ven 8 h)</text>
+  <rect x="60" y="390" width="200" height="80" rx="10" class="box"/><text x="80" y="424" class="t">Créneau du jour</text><text x="80" y="448" class="s">+ accroches passées</text>
+  <rect x="310" y="390" width="200" height="80" rx="10" class="ai"/><text x="330" y="424" class="t">Étape IA</text><text x="330" y="448" class="s" fill="#1B3A4B">JSON · mock | OpenAI</text>
+  <rect x="560" y="390" width="230" height="80" rx="10" class="box"/><text x="580" y="424" class="t">Contrôles</text><text x="580" y="448" class="s">format, longueurs, répétition</text>
+  <rect x="840" y="390" width="210" height="80" rx="10" class="box"/><text x="860" y="424" class="t">Visuel SVG</text><text x="860" y="448" class="s">1080×1350, 5 gabarits</text>
+  <rect x="1100" y="390" width="200" height="80" rx="10" class="box"/><text x="1120" y="424" class="t">Fichiers</text><text x="1120" y="448" class="s">output/ · to_review</text>
+  <rect x="1350" y="390" width="200" height="80" rx="10" class="hum"/><text x="1370" y="424" class="tw">Validation</text><text x="1370" y="448" class="sw">humaine (formulaire)</text>
+  <path d="M260 430H306" class="ln"/><path d="M510 430H556" class="ln"/><path d="M790 430H836" class="ln"/><path d="M1050 430H1096" class="ln"/><path d="M1300 430H1346" class="ln"/>
+  <path d="M610 470C610 525 410 525 410 474" class="er"/><text x="300" y="545" class="et">invalide ou répétée → 1 nouvel essai</text>
+  <path d="M740 470V600" class="er"/><text x="755" y="540" class="et">échec après nouvel essai</text>
+
+  <!-- outcomes -->
+  <rect x="1200" y="560" width="160" height="70" rx="10" class="box"/><text x="1220" y="592" class="t">outbox/</text><text x="1220" y="614" class="s">approuvé</text>
+  <rect x="1390" y="560" width="160" height="70" rx="10" class="box"/><text x="1410" y="592" class="t">rejected/</text><text x="1410" y="614" class="s">+ motif</text>
+  <path d="M1420 470C1420 520 1280 520 1280 556" class="ln"/><path d="M1470 470V556" class="ln"/>
+  <rect x="625" y="604" width="230" height="70" rx="10" class="box" stroke="#B5462E"/><text x="645" y="636" class="t" fill="#B5462E">_errors/</text><text x="645" y="658" class="s">statut error + trace</text>
+
+  <!-- Lane E -->
+  <text x="60" y="700" class="lane">E · ERREURS (toute panne imprévue)</text>
+  <rect x="60" y="720" width="260" height="70" rx="10" class="box"/><text x="80" y="752" class="t">Error Trigger</text><text x="80" y="774" class="s">→ trace dans _errors/</text>
+
+  <!-- legend -->
+  <rect x="900" y="725" width="22" height="22" rx="4" class="ai"/><text x="932" y="742" class="s">seule étape IA</text>
+  <rect x="1060" y="725" width="22" height="22" rx="4" class="hum"/><text x="1092" y="742" class="s">action humaine</text>
+  <path d="M1240 736H1290" class="er"/><text x="1300" y="742" class="s">chemin d'erreur</text>
+  <text x="900" y="790" class="s">Publication LinkedIn / Instagram : simulée (outbox/) · aucune notification envoyée · 0 € en mode démo</text>
+</svg>
