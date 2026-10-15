@@ -1,6 +1,6 @@
 # Brief — Pipeline éditorial hebdomadaire LinkedIn + Instagram
 
-> Statut : **brouillon — en attente de validation**. Rien n'est construit.
+> Statut : **validé le 2026-10-15**. Rien n'est construit.
 > Légende : ✅ décidé · 💡 proposition · ❓ inconnu / à vérifier (étape 3)
 
 ## 1. Problème

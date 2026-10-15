@@ -1,13 +1,13 @@
 # Projet 4 — Workflow de création automatisé
 
-> Statut : **brief en validation** — aucun workflow construit.
+> Statut : **brief validé, architecture en validation** — aucun workflow construit.
 
 ## Concept
 Pipeline éditorial hebdomadaire orchestré par **n8n** pour une marque **fictive** (Café Lumen) : une idée saisie le lundi devient chaque jour un post LinkedIn et un post Instagram (avec visuel SVG), validés par un humain avant d'être déposés dans une boîte d'envoi **simulée**. Aucune publication réelle. Détails : [docs/BRIEF.md](docs/BRIEF.md).
 
 ## Décisions
 - [x] Concept : pipeline éditorial LinkedIn + Instagram, 5 angles, validation humaine
-- [ ] Périmètre et livrables (brief à valider)
+- [x] Périmètre et livrables (voir brief)
 - [ ] Hébergement, fournisseur IA, licences et quotas vérifiés
 - [ ] Budget alloué (sur plafond global 200 €)
 
@@ -21,6 +21,7 @@ Pipeline éditorial hebdomadaire orchestré par **n8n** pour une marque **fictiv
 
 ## Documentation
 - [Brief](docs/BRIEF.md)
+- [Architecture](docs/ARCHITECTURE.md)
 - [Coûts](docs/COSTS.md)
 - [Crédits & licences](docs/CREDITS.md)
 - [Intégration portfolio](docs/PORTFOLIO.md)
