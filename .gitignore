@@ -9,3 +9,8 @@ output/*
 !output/.gitkeep
 __pycache__/
 .venv/
+
+# n8n local data / logs (may contain credentials)
+.n8n/
+*.sqlite
+*.log
