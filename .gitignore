@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+*.tmp
+.env
+.env.*
+!.env.example
+node_modules/
+output/*
+!output/.gitkeep
+__pycache__/
+.venv/
