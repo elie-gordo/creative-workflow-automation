@@ -1,10 +1,10 @@
 {
-  "name": "CL — A · Planifier la semaine",
+  "name": "TENSIL — A · Planifier la semaine",
   "nodes": [
     {
-      "id": "af6e8b34-43b4-5a4c-993a-8347970a42e9",
-      "name": "Formulaire : idée de la semaine",
-      "webhookId": "51ca8155-be44-560b-a2ae-8f0677dc6c68",
+      "id": "31db10ec-7bf2-5034-9ce2-c8f53f20e50b",
+      "name": "Formulaire : brief de la semaine",
+      "webhookId": "03bc8404-631f-5a13-95c4-c1cb6ab9064b",
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.2,
       "position": [
@@ -12,8 +12,8 @@
         300
       ],
       "parameters": {
-        "formTitle": "Café Lumen — idée de la semaine",
-        "formDescription": "Démo portfolio, marque fictive. Une idée → 5 jours de posts LinkedIn + Instagram à valider.",
+        "formTitle": "TENSIL — brief de campagne",
+        "formDescription": "Démo portfolio : TENSIL est une marque fictive, rien n'est vendu ni publié. Un brief → 5 jours de posts LinkedIn + Instagram, chacun validé par un humain. Prix, promesses de vente et chiffres absents de la fiche produit sont refusés.",
         "formFields": {
           "values": [
             {
@@ -23,18 +23,18 @@
             },
             {
               "fieldLabel": "Thème de la semaine",
-              "placeholder": "Lancement du cold brew d'automne",
+              "placeholder": "Semaine de présentation de la lampe TENSIL",
               "requiredField": true
             },
             {
               "fieldLabel": "Message clé",
               "fieldType": "textarea",
-              "placeholder": "Infusé 18 h, sans sucre ajouté",
+              "placeholder": "Une lampe de bureau articulée, équilibrée par 2 ressorts par segment",
               "requiredField": true
             },
             {
-              "fieldLabel": "Produit mis en avant (optionnel)",
-              "placeholder": "Cold Brew Lumen 25 cl"
+              "fieldLabel": "Produit ou coloris mis en avant (optionnel)",
+              "placeholder": "TENSIL Graphite"
             },
             {
               "fieldLabel": "Ton",
@@ -43,34 +43,34 @@
               "fieldOptions": {
                 "values": [
                   {
+                    "option": "sobre"
+                  },
+                  {
+                    "option": "technique"
+                  },
+                  {
                     "option": "chaleureux"
                   },
                   {
                     "option": "direct"
-                  },
-                  {
-                    "option": "expert"
-                  },
-                  {
-                    "option": "ludique"
                   }
                 ]
               }
             },
             {
               "fieldLabel": "Appel à l'action (optionnel)",
-              "placeholder": "Disponible en boutique"
+              "placeholder": "Voir la boutique de démonstration"
             }
           ]
         },
         "responseMode": "lastNode",
         "options": {
-          "path": "cl-brief"
+          "path": "tensil-brief"
         }
       }
     },
     {
-      "id": "7004e29c-f85f-5f0a-b76a-cd36c79a0e23",
+      "id": "01f14440-5384-58e6-83be-b905c28ae945",
       "name": "Valider le brief",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -79,11 +79,11 @@
         300
       ],
       "parameters": {
-        "jsCode": "const ANGLES = ['chiffre', 'astuce', 'coulisses', 'question', 'produit'];\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\n// Normalise the form submission and validate it against the brief rules.\nconst TONES = ['chaleureux', 'direct', 'expert', 'ludique'];\nconst f = $input.first().json;\nconst pick = (...keys) => {\n  for (const k of keys) if (f[k] !== undefined && f[k] !== null) return String(f[k]).trim();\n  return '';\n};\nconst brief = {\n  week_start: pick('Semaine (lundi)', 'week_start'),\n  theme: pick('Thème de la semaine', 'theme'),\n  key_message: pick('Message clé', 'key_message'),\n  product: pick('Produit mis en avant (optionnel)', 'product'),\n  tone: pick('Ton', 'tone').toLowerCase(),\n  cta: pick(\"Appel à l'action (optionnel)\", 'cta'),\n};\n\nconst errors = [];\nconst checkLength = (value, min, max, label, required) => {\n  if (!value) { if (required) errors.push(`${label} : obligatoire`); return; }\n  if (value.length < min || value.length > max) errors.push(`${label} : ${min} à ${max} caractères (actuel : ${value.length})`);\n};\n\nfunction isoWeek(d) {\n  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));\n  const day = t.getUTCDay() || 7;\n  t.setUTCDate(t.getUTCDate() + 4 - day);\n  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));\n  const w = Math.ceil(((t - y0) / 86400000 + 1) / 7);\n  return `${t.getUTCFullYear()}-W${String(w).padStart(2, '0')}`;\n}\n\nlet weekId = '';\nconst m = /^(\\d{4})-(\\d{2})-(\\d{2})/.exec(brief.week_start);\nif (!m) {\n  errors.push('Semaine : date au format AAAA-MM-JJ obligatoire');\n} else {\n  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));\n  if (isNaN(d) || d.getUTCDay() !== 1) errors.push('Semaine : la date doit être un lundi');\n  else { brief.week_start = d.toISOString().slice(0, 10); weekId = isoWeek(d); }\n}\ncheckLength(brief.theme, 10, 120, 'Thème', true);\ncheckLength(brief.key_message, 10, 200, 'Message clé', true);\ncheckLength(brief.product, 0, 80, 'Produit', false);\ncheckLength(brief.cta, 0, 40, \"Appel à l'action\", false);\nif (!TONES.includes(brief.tone)) errors.push(`Ton : valeur attendue parmi ${TONES.join(', ')}`);\n\nreturn [{ json: { valid: errors.length === 0, errors, brief, week_id: weekId } }];"
+        "jsCode": "const ANGLES = ['devoilement', 'anatomie', 'coulisses', 'coloris', 'boutique'];\nconst ANGLE_LABELS = { devoilement: 'Dévoilement', anatomie: 'Anatomie', coulisses: 'Coulisses', coloris: 'Coloris', boutique: 'La boutique' };\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst PRODUCT_FACTS = [\n  \"TENSIL est une marque fictive, créée pour un projet de portfolio. La lampe n'est pas commercialisée.\",\n  'Lampe de bureau articulée : bras en deux segments de 30 cm, soit 60 cm de portée.',\n  'Ressorts équilibreurs : 2 ressorts par segment compensent le poids du bras, sans molette à serrer.',\n  'Le principe des ressorts équilibreurs est connu depuis les années 1930 ; TENSIL le réinterprète avec une silhouette propre.',\n  'Base en disque lestée de 22 cm de diamètre ; hauteur de 43 cm en position de travail.',\n  'Abat-jour conique de 15 cm de diamètre, avec réflecteur interne.',\n  'Matériaux représentés : acier laqué verni (bras, base, abat-jour), laiton brossé (rotules), acier poli (ressorts), câble en caoutchouc.',\n  '4 coloris de laque : Graphite (presque noir), Sauge (vert gris doux), Oxyde (rouge brique), Crème (blanc cassé).',\n  'Toutes les images sont des images de synthèse : modèle 3D construit par scripts Python dans Blender 5.2, sans modélisation manuelle, rendu avec Cycles.',\n  \"Un film de 8 s montre la lampe qui se déplie puis s'allume.\",\n  'Une boutique de démonstration est en ligne : vue 3D à 360°, changement de coloris en direct, parcours de commande simulé, sans paiement ni vente.',\n];\n\n// Claims a fictive, unsold product cannot make. Checked on the brief (A) and on every AI output (B). Not exhaustive.\nconst CLAIMS = [\n  ['prix', /€|\\bprix\\b|\\beuros?\\b|\\btarif/],\n  ['vente', /\\ben vente\\b|\\bachetez\\b|\\bcommandez\\b|\\bprecommand|\\ben stock\\b|\\bdisponibles?\\b|\\bpromo|\\bsoldes?\\b/],\n  ['livraison', /\\blivraison/],\n  ['caractéristique non documentée', /\\bled\\b|\\blumens?\\b|\\bkelvins?\\b|\\bwatts?\\b|\\bdimmable|\\bvariateur|\\bbatterie|\\busb\\b|\\bsans fil\\b|\\bcapteur/],\n  ['garantie', /\\bgaranti|\\brembours|\\bcertifi|\\bnormes?\\b/],\n  ['origine ou engagement non vérifié', /\\bfait main\\b|\\ba la main\\b|\\bartisan|\\bfabriquee? en\\b|\\bmade in\\b|\\becolog|\\beco-?respons|\\brecycl|\\bdurable/],\n  ['superlatif', /\\bn°\\s?1\\b|\\bnumero un\\b|\\bmeilleure?s?\\b|\\brevolutionnaire|\\bincomparable|\\bunique au monde/],\n  ['confort visuel non vérifié', /\\beblou|\\bfatigue visuelle/],\n];\nconst normText = (s) => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');\nconst findClaims = (text) => CLAIMS\n  .map(([label, re]) => { const m = normText(text).match(re); return m ? `${label} (« ${m[0]} »)` : null; })\n  .filter(Boolean);\n\n// Every number written must come from the product facts (0 and 1 are always allowed). Decimals are one number (1,2 ≠ 1 and 2).\nconst numbersIn = (text) => (String(text ?? '').match(/\\d+(?:[.,]\\d+)?/g) || []).map((n) => n.replace(',', '.'));\nconst FACT_NUMBERS = new Set(['0', '1', ...numbersIn(PRODUCT_FACTS.join(' '))]);\nconst unverifiedNumbers = (text) => [...new Set(numbersIn(text).filter((n) => !FACT_NUMBERS.has(n)))];\n\n// Normalise the form submission and validate it against the brief rules and the product facts.\nconst TONES = ['sobre', 'technique', 'chaleureux', 'direct'];\nconst f = $input.first().json;\nconst pick = (...keys) => {\n  for (const k of keys) if (f[k] !== undefined && f[k] !== null) return String(f[k]).trim();\n  return '';\n};\nconst brief = {\n  week_start: pick('Semaine (lundi)', 'week_start'),\n  theme: pick('Thème de la semaine', 'theme'),\n  key_message: pick('Message clé', 'key_message'),\n  product: pick('Produit ou coloris mis en avant (optionnel)', 'product'),\n  tone: pick('Ton', 'tone').toLowerCase(),\n  cta: pick(\"Appel à l'action (optionnel)\", 'cta'),\n};\n\nconst errors = [];\nconst checkLength = (value, min, max, label, required) => {\n  if (!value) { if (required) errors.push(`${label} : obligatoire`); return; }\n  if (value.length < min || value.length > max) errors.push(`${label} : ${min} à ${max} caractères (actuel : ${value.length})`);\n};\n\nfunction isoWeek(d) {\n  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));\n  const day = t.getUTCDay() || 7;\n  t.setUTCDate(t.getUTCDate() + 4 - day);\n  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));\n  const w = Math.ceil(((t - y0) / 86400000 + 1) / 7);\n  return `${t.getUTCFullYear()}-W${String(w).padStart(2, '0')}`;\n}\n\nlet weekId = '';\nconst m = /^(\\d{4})-(\\d{2})-(\\d{2})/.exec(brief.week_start);\nif (!m) {\n  errors.push('Semaine : date au format AAAA-MM-JJ obligatoire');\n} else {\n  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));\n  if (isNaN(d) || d.getUTCDay() !== 1) errors.push('Semaine : la date doit être un lundi');\n  else { brief.week_start = d.toISOString().slice(0, 10); weekId = isoWeek(d); }\n}\ncheckLength(brief.theme, 10, 120, 'Thème', true);\ncheckLength(brief.key_message, 10, 200, 'Message clé', true);\ncheckLength(brief.product, 0, 80, 'Produit', false);\ncheckLength(brief.cta, 0, 40, \"Appel à l'action\", false);\nif (!TONES.includes(brief.tone)) errors.push(`Ton : valeur attendue parmi ${TONES.join(', ')}`);\n\nconst text = [brief.theme, brief.key_message, brief.product, brief.cta].join(' ');\nfor (const c of findClaims(text)) errors.push(`Promesse non vérifiable pour un produit fictif : ${c}`);\nconst nums = unverifiedNumbers(text);\nif (nums.length) errors.push(`Chiffre absent de la fiche produit : ${nums.join(', ')}`);\n\nreturn [{ json: { valid: errors.length === 0, errors, brief, week_id: weekId } }];"
       }
     },
     {
-      "id": "7155a67f-8fca-5589-a3f6-34617aa505bd",
+      "id": "57159ba8-aab6-589f-8d02-4e6bac38cf9a",
       "name": "Semaine déjà planifiée ?",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -97,7 +97,7 @@
         "operation": "get",
         "dataTableId": {
           "mode": "id",
-          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+          "value": "REPLACE_WITH_tensil_slots_TABLE_ID"
         },
         "matchType": "allConditions",
         "filters": {
@@ -113,7 +113,7 @@
       }
     },
     {
-      "id": "01778949-f3bf-500a-b3b7-cad8d7291a07",
+      "id": "1a72f680-456d-5813-b230-1468eabb5113",
       "name": "Construire le plan",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -122,11 +122,11 @@
         300
       ],
       "parameters": {
-        "jsCode": "const ANGLES = ['chiffre', 'astuce', 'coulisses', 'question', 'produit'];\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\n// Refuse an already-planned week, otherwise build the 5 daily slots (one angle per day).\nconst v = $('Valider le brief').first().json;\nconst existing = $input.all().filter((i) => i.json && i.json.id);\nconst errors = [...v.errors];\nif (v.valid && existing.length) errors.push(`Semaine ${v.week_id} déjà planifiée (${existing.length} créneaux)`);\nif (errors.length) return [{ json: { ok: false, errors, message: errors.map((e) => '• ' + e).join('\\n') } }];\n\nconst start = new Date(v.brief.week_start + 'T00:00:00Z');\nconst now = new Date().toISOString();\nreturn ANGLES.map((angle, i) => {\n  const d = new Date(start);\n  d.setUTCDate(d.getUTCDate() + i);\n  return { json: { ok: true, week_id: v.week_id, date: d.toISOString().slice(0, 10), day_index: i + 1, angle,\n    ...v.brief, status: 'planned', updated_at: now } };\n});"
+        "jsCode": "const ANGLES = ['devoilement', 'anatomie', 'coulisses', 'coloris', 'boutique'];\nconst ANGLE_LABELS = { devoilement: 'Dévoilement', anatomie: 'Anatomie', coulisses: 'Coulisses', coloris: 'Coloris', boutique: 'La boutique' };\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\n// Refuse an already-planned week, otherwise build the 5 daily slots (one angle per day).\nconst v = $('Valider le brief').first().json;\nconst existing = $input.all().filter((i) => i.json && i.json.id);\nconst errors = [...v.errors];\nif (v.valid && existing.length) errors.push(`Semaine ${v.week_id} déjà planifiée (${existing.length} créneaux)`);\nif (errors.length) return [{ json: { ok: false, errors, message: errors.map((e) => '• ' + e).join('\\n') } }];\n\nconst start = new Date(v.brief.week_start + 'T00:00:00Z');\nconst now = new Date().toISOString();\nreturn ANGLES.map((angle, i) => {\n  const d = new Date(start);\n  d.setUTCDate(d.getUTCDate() + i);\n  return { json: { ok: true, week_id: v.week_id, date: d.toISOString().slice(0, 10), day_index: i + 1, angle,\n    ...v.brief, status: 'planned', updated_at: now } };\n});"
       }
     },
     {
-      "id": "ddc82353-e343-526c-9082-95508996c834",
+      "id": "74887dbd-c78d-5ecd-b603-7a32d7fe17a1",
       "name": "Plan valide ?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -160,7 +160,7 @@
       }
     },
     {
-      "id": "541f5a92-572a-5875-8927-475e196d76ee",
+      "id": "0ad96217-3476-5dd2-870e-79fc8cb69e00",
       "name": "Enregistrer les créneaux",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -173,7 +173,7 @@
         "operation": "insert",
         "dataTableId": {
           "mode": "id",
-          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+          "value": "REPLACE_WITH_tensil_slots_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -310,7 +310,7 @@
       }
     },
     {
-      "id": "49c78ee0-21b2-5a23-ad72-d4abc41cc762",
+      "id": "d884024e-759c-5458-9cad-16bfd730d466",
       "name": "Page : plan créé",
       "type": "n8n-nodes-base.form",
       "typeVersion": 1,
@@ -322,13 +322,13 @@
       "parameters": {
         "operation": "completion",
         "completionTitle": "Plan créé",
-        "completionMessage": "=5 créneaux planifiés pour la semaine {{ $('Construire le plan').first().json.week_id }}. Les posts seront produits chaque jour ouvré et soumis à validation.",
+        "completionMessage": "=5 créneaux planifiés pour la semaine {{ $('Construire le plan').first().json.week_id }} : dévoilement, anatomie, coulisses, coloris, boutique. Chaque jour ouvré produit un post LinkedIn et un post Instagram soumis à validation. Rien n'est publié.",
         "options": {}
       },
-      "webhookId": "67387609-790b-4eee-a748-0a0107577380"
+      "webhookId": "599a9c2d-b912-4bf9-85d9-3527a98062b7"
     },
     {
-      "id": "7ed01ca3-b9c7-5f4c-8b4c-434fed131816",
+      "id": "9ea7061f-9291-5e29-ab71-66cda91d426a",
       "name": "Page : brief refusé",
       "type": "n8n-nodes-base.form",
       "typeVersion": 1,
@@ -342,11 +342,11 @@
         "completionMessage": "={{ $json.message }}",
         "options": {}
       },
-      "webhookId": "c4677712-6885-402f-bac8-ee0406f5ca4a"
+      "webhookId": "d9503d26-beed-43da-a9b8-9e80d30825a7"
     }
   ],
   "connections": {
-    "Formulaire : idée de la semaine": {
+    "Formulaire : brief de la semaine": {
       "main": [
         [
           {
@@ -424,6 +424,6 @@
     "executionOrder": "v1"
   },
   "meta": {
-    "note": "Demo portfolio Café Lumen (fictive). No credentials included. Set the data table ID and the error workflow after import."
+    "note": "Demo portfolio TENSIL (fictive brand, nothing is sold or published). No credentials included. Set the data table ID and the error workflow after import."
   }
 }

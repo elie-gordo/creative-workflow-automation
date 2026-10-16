@@ -1,0 +1,46 @@
+{
+  "brand": "TENSIL (marque fictive, démo portfolio)",
+  "brief": {
+    "week_id": "2026-W43",
+    "theme": "Semaine de présentation de la lampe TENSIL",
+    "key_message": "Une lampe de bureau articulée, équilibrée par 2 ressorts par segment",
+    "product": "TENSIL Graphite",
+    "tone": "sobre",
+    "cta": "Voir la boutique de démonstration"
+  },
+  "slot": {
+    "date": "2026-10-23",
+    "day": "ven",
+    "angle": "boutique",
+    "angle_label": "La boutique"
+  },
+  "status": "to_review",
+  "review_notes": [],
+  "mode": "mock",
+  "prompt_version": "tensil-v1",
+  "attempts": 1,
+  "checks": [
+    {
+      "attempt": 1,
+      "result": "ok",
+      "errors": [],
+      "similar_hook": null
+    }
+  ],
+  "visual": {
+    "file": "2026-W43_5-ven_boutique_instagram_1080x1350.svg",
+    "title": "À voir sous tous les angles",
+    "subtitle": "Boutique de démonstration · vue 3D à 360°",
+    "render": {
+      "repo": "elie-gordo/blender-studio-object",
+      "ref": "ec74096adb0c2fea723eedd12b1ea9f6c1a26699",
+      "path": "renders/web/04_lit.webp",
+      "embedded": true,
+      "source": "https://github.com/elie-gordo/blender-studio-object/blob/ec74096adb0c2fea723eedd12b1ea9f6c1a26699/renders/web/04_lit.webp"
+    }
+  },
+  "review_url": "https://n8n.example.com/form-waiting/605?signature=REDACTED",
+  "published": false,
+  "execution_id": "605",
+  "generated_at": "2026-10-16T12:13:29.131Z"
+}

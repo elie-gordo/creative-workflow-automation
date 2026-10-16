@@ -1,0 +1,7 @@
+{
+  "workflow": "TENSIL — X · Test du workflow d'erreur (temporaire)",
+  "execution_id": "609",
+  "last_node": "Panne simulée",
+  "message": "Panne simulée pour tester le workflow E [line 1]",
+  "at": "2026-10-16T12:13:37.045Z"
+}

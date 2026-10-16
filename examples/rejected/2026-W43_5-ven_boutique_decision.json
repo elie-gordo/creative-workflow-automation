@@ -1,0 +1,20 @@
+{
+  "brand": "TENSIL (marque fictive, démo portfolio)",
+  "brief": {
+    "week_id": "2026-W43",
+    "theme": "Semaine de présentation de la lampe TENSIL",
+    "key_message": "Une lampe de bureau articulée, équilibrée par 2 ressorts par segment",
+    "product": "TENSIL Graphite",
+    "tone": "sobre",
+    "cta": "Voir la boutique de démonstration"
+  },
+  "date": "2026-10-23",
+  "angle": "boutique",
+  "status": "rejected",
+  "reason": "Accroche trop proche de la page d'accueil du site",
+  "review_notes": [],
+  "decided_at": "2026-10-16T12:13:30.276Z",
+  "execution_id": "605",
+  "published": false,
+  "note": "Publication simulée : aucun envoi vers LinkedIn ou Instagram."
+}

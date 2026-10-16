@@ -1,8 +1,8 @@
 {
-  "name": "CL — B · Produire le jour",
+  "name": "TENSIL — B · Produire le jour",
   "nodes": [
     {
-      "id": "41ff680f-c1e8-5cf0-ad22-c772df12868a",
+      "id": "f64693e2-1c6f-5a6e-9b2e-9de78cc8e0c2",
       "name": "Chaque jour ouvré 8 h",
       "disabled": true,
       "type": "n8n-nodes-base.scheduleTrigger",
@@ -23,9 +23,9 @@
       }
     },
     {
-      "id": "26239928-b624-57d2-bf88-50ee298ba5ec",
+      "id": "863f7a64-1df5-5b34-b0ca-5323a7645064",
       "name": "Webhook : test / date forcée",
-      "webhookId": "2af95015-1bc5-5c8c-82c6-42e8c64744e5",
+      "webhookId": "d7625459-3972-514e-ab49-ff9ff2f69d5c",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
@@ -34,13 +34,13 @@
       ],
       "parameters": {
         "httpMethod": "POST",
-        "path": "cl-produire",
+        "path": "tensil-produire",
         "responseMode": "onReceived",
         "options": {}
       }
     },
     {
-      "id": "b8cf9718-d5dc-5fcf-86e3-fd3696808aa8",
+      "id": "fb56350b-c768-59f3-b874-2a04bfd58e92",
       "name": "Contexte",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -49,11 +49,11 @@
         300
       ],
       "parameters": {
-        "jsCode": "// Configuration (no secrets here) + test overrides from the webhook body.\nconst CONFIG = {\n  mode: 'mock',              // 'mock' (default, free) or 'live' (OpenAI, needs the credential)\n  llm_model: 'gpt-4o-mini', // live mode only\n  base_path: '/home/node/.n8n-files/cafe-lumen',\n  max_attempts: 2,\n  similarity_threshold: 0.6,\n};\nconst MOCK_CASES = ['valid', 'invalid_once', 'invalid_json', 'repeat'];\nconst input = $input.first().json;\nconst body = input.body || {};\nconst date = /^\\d{4}-\\d{2}-\\d{2}$/.test(body.date || '') ? body.date : $now.toISODate();\nconst mode = ['mock', 'live'].includes(body.mode) ? body.mode : CONFIG.mode;\nconst mock_case = MOCK_CASES.includes(body.mock_case) ? body.mock_case : 'valid';\nreturn [{ json: { config: CONFIG, date, mode, mock_case, trigger: input.body ? 'webhook' : 'schedule' } }];"
+        "jsCode": "// Configuration (no secrets here) + test overrides from the webhook body.\nconst CONFIG = {\n  mode: 'mock',              // 'mock' (default, free) or 'live' (OpenAI, needs the credential)\n  llm_model: 'gpt-4o-mini', // live mode only\n  base_path: '/home/node/.n8n-files/tensil',\n  max_attempts: 2,\n  similarity_threshold: 0.6,\n  prompt_version: 'tensil-v1',\n};\nconst MOCK_CASES = ['valid', 'invalid_once', 'invalid_json', 'repeat', 'claim'];\nconst input = $input.first().json;\nconst body = input.body || {};\nconst date = /^\\d{4}-\\d{2}-\\d{2}$/.test(body.date || '') ? body.date : $now.toISODate();\nconst mode = ['mock', 'live'].includes(body.mode) ? body.mode : CONFIG.mode;\nconst mock_case = MOCK_CASES.includes(body.mock_case) ? body.mock_case : 'valid';\nreturn [{ json: { config: CONFIG, date, mode, mock_case, trigger: input.body ? 'webhook' : 'schedule' } }];"
       }
     },
     {
-      "id": "cbe5d108-8952-514f-baf1-dd25b7333c9b",
+      "id": "3f3d6dd5-4ebd-58ea-98d0-e93b80934e2b",
       "name": "Créneau du jour",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -67,7 +67,7 @@
         "operation": "get",
         "dataTableId": {
           "mode": "id",
-          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+          "value": "REPLACE_WITH_tensil_slots_TABLE_ID"
         },
         "matchType": "allConditions",
         "filters": {
@@ -89,7 +89,7 @@
       }
     },
     {
-      "id": "8e5cb166-20a7-5812-96f5-c77de1eb6a65",
+      "id": "de131379-2b5b-50db-9f5c-5bea443764ae",
       "name": "Créneau trouvé ?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -123,7 +123,7 @@
       }
     },
     {
-      "id": "99370821-bc5e-5331-b5e7-b246baaf478e",
+      "id": "8313611c-406d-5736-b5ed-1a974e2ed48c",
       "name": "Rien à produire",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
@@ -134,7 +134,7 @@
       "parameters": {}
     },
     {
-      "id": "b111b40d-72be-5404-af40-7109a45fba5d",
+      "id": "49e839b8-c291-5d4c-a73b-39ca028c3d9a",
       "name": "Historique des accroches",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -148,7 +148,7 @@
         "operation": "get",
         "dataTableId": {
           "mode": "id",
-          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+          "value": "REPLACE_WITH_tensil_slots_TABLE_ID"
         },
         "matchType": "allConditions",
         "filters": {
@@ -158,7 +158,7 @@
       }
     },
     {
-      "id": "b058bd79-758b-5d57-a9b7-ca2b3241c091",
+      "id": "f5654f83-1931-5200-af3a-7bd3e107cef7",
       "name": "Préparer le prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -167,11 +167,11 @@
         220
       ],
       "parameters": {
-        "jsCode": "// Build the prompt for the day's slot, with the hooks already used (anti-repetition).\nconst ctx = $('Contexte').first().json;\nconst slot = $('Créneau du jour').first().json;\nconst history_hooks = $input.all().map((i) => i.json)\n  .filter((r) => r.id && r.id !== slot.id && r.hook && ['to_review', 'needs_review', 'approved'].includes(r.status))\n  .map((r) => r.hook).slice(-30);\n\nconst ANGLE_GUIDE = {\n  chiffre: 'Mettre en avant UN chiffre tiré du brief (ne pas en inventer). visual.title = le chiffre seul.',\n  astuce: 'Donner une astuce pratique en 3 points liée au thème.',\n  coulisses: \"Raconter un court moment de coulisses de l'atelier de torréfaction.\",\n  question: 'Poser une question ouverte à la communauté, liée au thème.',\n  produit: \"Présenter le produit mis en avant et finir par l'appel à l'action.\",\n};\nconst system_prompt = [\n  'Tu es rédacteur social media pour Café Lumen, une torréfaction artisanale FICTIVE (démo portfolio).',\n  'Réponds uniquement avec un objet JSON conforme au schéma fourni.',\n  \"N'invente aucun chiffre, prix, label ou promesse absent du brief. Maximum 2 emojis par texte.\",\n].join('\\n');\nconst user_prompt = [\n  `Date : ${slot.date} — angle du jour : ${slot.angle}. ${ANGLE_GUIDE[slot.angle]}`,\n  `Thème : ${slot.theme}`, `Message clé : ${slot.key_message}`,\n  `Produit : ${slot.product || '(aucun)'}`, `Ton : ${slot.tone}`, `Appel à l'action : ${slot.cta || '(aucun)'}`,\n  'Contraintes : hook ≤ 90 caractères ; linkedin_text 300–1300 caractères, ton professionnel, paragraphes courts ;',\n  'instagram_caption 80–600 caractères sans hashtags ; hashtags : 3 à 8, format #MotSansEspace ;',\n  'visual.title ≤ 40 caractères ; visual.subtitle ≤ 80 caractères.',\n  history_hooks.length ? `Accroches déjà utilisées, à ne pas reprendre : ${history_hooks.map((h) => `\"${h}\"`).join(' ; ')}` : '',\n].filter(Boolean).join('\\n');\n\nreturn [{ json: { ...ctx, slot, history_hooks, attempt: 1, retry_hint: '', system_prompt, user_prompt } }];"
+        "jsCode": "const ANGLES = ['devoilement', 'anatomie', 'coulisses', 'coloris', 'boutique'];\nconst ANGLE_LABELS = { devoilement: 'Dévoilement', anatomie: 'Anatomie', coulisses: 'Coulisses', coloris: 'Coloris', boutique: 'La boutique' };\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst PRODUCT_FACTS = [\n  \"TENSIL est une marque fictive, créée pour un projet de portfolio. La lampe n'est pas commercialisée.\",\n  'Lampe de bureau articulée : bras en deux segments de 30 cm, soit 60 cm de portée.',\n  'Ressorts équilibreurs : 2 ressorts par segment compensent le poids du bras, sans molette à serrer.',\n  'Le principe des ressorts équilibreurs est connu depuis les années 1930 ; TENSIL le réinterprète avec une silhouette propre.',\n  'Base en disque lestée de 22 cm de diamètre ; hauteur de 43 cm en position de travail.',\n  'Abat-jour conique de 15 cm de diamètre, avec réflecteur interne.',\n  'Matériaux représentés : acier laqué verni (bras, base, abat-jour), laiton brossé (rotules), acier poli (ressorts), câble en caoutchouc.',\n  '4 coloris de laque : Graphite (presque noir), Sauge (vert gris doux), Oxyde (rouge brique), Crème (blanc cassé).',\n  'Toutes les images sont des images de synthèse : modèle 3D construit par scripts Python dans Blender 5.2, sans modélisation manuelle, rendu avec Cycles.',\n  \"Un film de 8 s montre la lampe qui se déplie puis s'allume.\",\n  'Une boutique de démonstration est en ligne : vue 3D à 360°, changement de coloris en direct, parcours de commande simulé, sans paiement ni vente.',\n];\n\n// Claims a fictive, unsold product cannot make. Checked on the brief (A) and on every AI output (B). Not exhaustive.\nconst CLAIMS = [\n  ['prix', /€|\\bprix\\b|\\beuros?\\b|\\btarif/],\n  ['vente', /\\ben vente\\b|\\bachetez\\b|\\bcommandez\\b|\\bprecommand|\\ben stock\\b|\\bdisponibles?\\b|\\bpromo|\\bsoldes?\\b/],\n  ['livraison', /\\blivraison/],\n  ['caractéristique non documentée', /\\bled\\b|\\blumens?\\b|\\bkelvins?\\b|\\bwatts?\\b|\\bdimmable|\\bvariateur|\\bbatterie|\\busb\\b|\\bsans fil\\b|\\bcapteur/],\n  ['garantie', /\\bgaranti|\\brembours|\\bcertifi|\\bnormes?\\b/],\n  ['origine ou engagement non vérifié', /\\bfait main\\b|\\ba la main\\b|\\bartisan|\\bfabriquee? en\\b|\\bmade in\\b|\\becolog|\\beco-?respons|\\brecycl|\\bdurable/],\n  ['superlatif', /\\bn°\\s?1\\b|\\bnumero un\\b|\\bmeilleure?s?\\b|\\brevolutionnaire|\\bincomparable|\\bunique au monde/],\n  ['confort visuel non vérifié', /\\beblou|\\bfatigue visuelle/],\n];\nconst normText = (s) => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');\nconst findClaims = (text) => CLAIMS\n  .map(([label, re]) => { const m = normText(text).match(re); return m ? `${label} (« ${m[0]} »)` : null; })\n  .filter(Boolean);\n\n// Every number written must come from the product facts (0 and 1 are always allowed). Decimals are one number (1,2 ≠ 1 and 2).\nconst numbersIn = (text) => (String(text ?? '').match(/\\d+(?:[.,]\\d+)?/g) || []).map((n) => n.replace(',', '.'));\nconst FACT_NUMBERS = new Set(['0', '1', ...numbersIn(PRODUCT_FACTS.join(' '))]);\nconst unverifiedNumbers = (text) => [...new Set(numbersIn(text).filter((n) => !FACT_NUMBERS.has(n)))];\n\n// Build the prompt for the day's slot: product facts, angle, brief, hooks already used (anti-repetition).\nconst ctx = $('Contexte').first().json;\nconst slot = $('Créneau du jour').first().json;\nconst history_hooks = $input.all().map((i) => i.json)\n  .filter((r) => r.id && r.id !== slot.id && r.hook && ['to_review', 'needs_review', 'approved'].includes(r.status))\n  .map((r) => r.hook).slice(-30);\n\n// One existing Blender render per angle (blender-studio-object, renders/web, 1600x900 WebP).\nconst ASSETS = {\n  devoilement: 'renders/web/01_hero.webp',\n  anatomie: 'renders/web/03_detail.webp',\n  coulisses: 'renders/web/wire_hero.webp',\n  coloris: 'renders/web/colorways_test.webp',\n  boutique: 'renders/web/04_lit.webp',\n};\nconst asset = { repo: 'elie-gordo/blender-studio-object', ref: 'ec74096adb0c2fea723eedd12b1ea9f6c1a26699', path: ASSETS[slot.angle] };\n\nconst ANGLE_GUIDE = {\n  devoilement: 'Présenter TENSIL dans son ensemble et le principe des ressorts équilibreurs. visual.title = une phrase courte qui décrit la lampe.',\n  anatomie: \"Mettre en avant UN chiffre de la fiche produit et le détail qu'il décrit (ressorts, rotules, base, abat-jour). visual.title = ce chiffre avec son unité ou son objet, 14 caractères maximum (ex. « 2 ressorts », « 22 cm »).\",\n  coulisses: \"Raconter comment la lampe a été construite en 3D : scripts Python dans Blender, maquette grise, maillage, matériaux, rendu. Dire clairement qu'il s'agit d'images de synthèse.\",\n  coloris: 'Présenter les 4 coloris de laque et poser UNE question ouverte : lequel choisiriez-vous ?',\n  boutique: \"Présenter la boutique de démonstration (vue 3D à 360°, coloris en direct, commande simulée) en rappelant que rien n'est vendu. Finir par l'appel à l'action.\",\n};\nconst system_prompt = [\n  \"Tu es rédacteur social media pour TENSIL, une marque FICTIVE de lampe de bureau articulée créée pour un projet de portfolio.\",\n  \"La lampe n'est pas commercialisée : aucun prix, aucune vente, aucune livraison, aucune disponibilité.\",\n  \"N'utilise que les faits de la fiche produit. N'invente aucun chiffre, matériau, fonction, label ou promesse.\",\n  'Les images sont des images de synthèse : ne les présente jamais comme des photos.',\n  'Style : phrases courtes, vocabulaire précis (mécanique, matière, lumière), pas de superlatifs. Maximum 2 emojis par texte.',\n  'Réponds uniquement avec un objet JSON conforme au schéma fourni.',\n  '', 'Fiche produit :', ...PRODUCT_FACTS.map((f) => '- ' + f),\n].join('\\n');\nconst user_prompt = [\n  `Date : ${slot.date} — jour ${slot.day_index} sur 5 — angle : ${ANGLE_LABELS[slot.angle]}. ${ANGLE_GUIDE[slot.angle]}`,\n  `Thème : ${slot.theme}`, `Message clé : ${slot.key_message}`,\n  `Produit ou coloris : ${slot.product || '(aucun)'}`, `Ton : ${slot.tone}`, `Appel à l'action : ${slot.cta || '(aucun)'}`,\n  'Contraintes : hook ≤ 90 caractères ; linkedin_text 300–1300 caractères, paragraphes courts ;',\n  'instagram_caption 80–600 caractères sans hashtags ; hashtags : 3 à 8, format #MotSansEspace, dont #TENSIL ;',\n  'visual.title ≤ 40 caractères ; visual.subtitle ≤ 80 caractères.',\n  history_hooks.length ? `Accroches déjà utilisées, à ne pas reprendre : ${history_hooks.map((h) => `\"${h}\"`).join(' ; ')}` : '',\n].filter(Boolean).join('\\n');\n\nreturn [{ json: { ...ctx, slot, asset, history_hooks, attempt: 1, attempts_log: [], retry_hint: '', system_prompt, user_prompt } }];"
       }
     },
     {
-      "id": "c63d0c13-2f05-5a72-af70-bee5dd82c42d",
+      "id": "15eacc61-8db0-5917-b080-1ad13e722405",
       "name": "Mode live ?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -205,7 +205,7 @@
       }
     },
     {
-      "id": "621a8a08-285d-5ced-948c-f01c538e19db",
+      "id": "eb07a098-b3d0-530d-b26d-0c8904ab7f8a",
       "name": "OpenAI : générer",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -228,7 +228,7 @@
       }
     },
     {
-      "id": "9f10c8f6-d727-5dd4-acd0-4e43fc0f2051",
+      "id": "ec07d3f5-66ce-5f4b-9a1c-d07c63e3d223",
       "name": "Réunir contexte + réponse",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
@@ -243,7 +243,7 @@
       }
     },
     {
-      "id": "dc22f364-da65-57c8-a076-09f329243c44",
+      "id": "1dd1e719-9558-582c-9145-8362fc73bc72",
       "name": "Réponse simulée (mock)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -252,11 +252,11 @@
         340
       ],
       "parameters": {
-        "jsCode": "// Simulated AI response (no API call). mock_case drives the test scenarios.\nconst it = $input.first().json;\nconst s = it.slot;\nconst num = ((/\\d+[.,]?\\d*\\s*(h|heures?|%|g|cl|°)?/i.exec(s.key_message) || [])[0] || '1').trim();\nconst product = s.product || 'notre café';\nconst cta = s.cta || 'Passez nous voir en boutique';\nconst variant = it.attempt > 1 ? ' (autrement dit)' : '';\nconst TEMPLATES = {\n  chiffre: () => ({\n    hook: `${num} : le chiffre clé de la semaine chez Café Lumen${variant}`.slice(0, 90),\n    visual: { title: num, subtitle: s.key_message.slice(0, 80) },\n  }),\n  astuce: () => ({\n    hook: `3 astuces pour profiter de ${product}${variant}`.slice(0, 90),\n    visual: { title: '3 astuces maison', subtitle: `Pour profiter de ${product}`.slice(0, 80) },\n  }),\n  coulisses: () => ({\n    hook: `Dans l'atelier : comment naît ${product}${variant}`.slice(0, 90),\n    visual: { title: \"Dans l'atelier\", subtitle: s.key_message.slice(0, 80) },\n  }),\n  question: () => ({\n    hook: `Et vous, comment aimez-vous votre café en ce moment ?${variant}`.slice(0, 90),\n    visual: { title: 'Et vous ?', subtitle: 'Racontez-nous en commentaire' },\n  }),\n  produit: () => ({\n    hook: `${product} arrive chez Café Lumen${variant}`.slice(0, 90),\n    visual: { title: product.slice(0, 40), subtitle: cta.slice(0, 80) },\n  }),\n};\nconst base = TEMPLATES[s.angle]();\nconst content = {\n  hook: base.hook,\n  linkedin_text: `${base.hook}\\n\\nCette semaine chez Café Lumen : ${s.theme}.\\n\\n${s.key_message}.\\n\\n` +\n    `Chaque lot est torréfié en petite quantité dans notre atelier, et nous ajustons chaque profil à la main.\\n\\n${cta}.`,\n  instagram_caption: `${base.hook}\\n\\n${s.key_message}. ${cta}.`,\n  hashtags: ['#CafeLumen', '#CafeDeSpecialite', '#Torrefaction', `#${s.angle.charAt(0).toUpperCase()}${s.angle.slice(1)}DuJour`],\n  visual: base.visual,\n};\n\nlet raw;\nif (it.mock_case === 'invalid_json' || (it.mock_case === 'invalid_once' && it.attempt === 1)) {\n  raw = '{\"hook\": \"Réponse tronquée par le fournisseur...';\n} else {\n  if (it.mock_case === 'repeat' && it.history_hooks.length) content.hook = it.history_hooks[0];\n  raw = JSON.stringify(content);\n}\nreturn [{ json: { ...it, raw_response: raw } }];"
+        "jsCode": "// Simulated AI response (no API call), written from the product facts. mock_case drives the test scenarios.\nconst it = $input.first().json;\nconst s = it.slot;\nconst alt = it.attempt > 1 ? 1 : 0;\nconst cta = s.cta || 'Voir la boutique de démonstration';\nconst ANAT = {\n  '2': ['2 ressorts', 'par segment, pour équilibrer le poids du bras'],\n  '60': ['60 cm', 'de portée, en deux segments de 30 cm'],\n  '22': ['22 cm', 'de diamètre pour la base lestée'],\n  '43': ['43 cm', 'de hauteur en position de travail'],\n  '15': ['15 cm', \"de diamètre pour l'abat-jour conique\"],\n};\nconst anat = ANAT[(s.key_message.match(/\\d+/g) || []).find((n) => ANAT[n]) || '2'];\nconst TEMPLATES = {\n  devoilement: () => ({\n    hooks: ['TENSIL : une lampe de bureau qui équilibre son propre bras', 'Voici TENSIL, la lampe articulée tenue par ses ressorts'],\n    body: \"TENSIL est une lampe de bureau articulée, imaginée pour un projet de portfolio. Son bras en deux segments est équilibré par des ressorts : pas de molette à serrer.\\n\\n\" +\n      `${s.key_message}.\\n\\nCette semaine, nous la présentons sous plusieurs angles : son anatomie, sa construction en 3D, ses coloris et sa boutique de démonstration.\\n\\n${cta}.`,\n    caption: `Lampe de bureau articulée, bras en deux segments, ressorts équilibreurs. ${cta}.`,\n    hashtags: ['#TENSIL', '#DesignProduit', '#LampeDeBureau', '#Rendu3D'],\n    visual: { title: 'Une lampe qui équilibre son bras', subtitle: 'Lampe de bureau articulée à ressorts' },\n  }),\n  anatomie: () => ({\n    hooks: [`${anat[0]} : ce qui tient le bras de TENSIL`, 'Anatomie de TENSIL, rotule après rotule'],\n    body: 'Gros plan sur la mécanique de TENSIL.\\n\\n' +\n      '• Ressorts équilibreurs : 2 par segment, ils compensent le poids du bras.\\n• Rotules en laiton : elles articulent les segments.\\n' +\n      '• Base lestée : un disque de 22 cm de diamètre.\\n• Abat-jour conique : 15 cm de diamètre, avec réflecteur interne.\\n\\n' +\n      `${s.key_message}.\\n\\n${cta}.`,\n    caption: `Ressorts équilibreurs, rotules en laiton, base lestée, abat-jour conique : la mécanique de TENSIL en un gros plan. ${cta}.`,\n    hashtags: ['#TENSIL', '#Anatomie', '#DesignIndustriel', '#Rendu3D'],\n    visual: { title: anat[0], subtitle: anat[1] },\n  }),\n  coulisses: () => ({\n    hooks: ['Dans les coulisses : TENSIL est née de scripts Python', 'Pas un seul clic de modélisation : TENSIL vient du code'],\n    body: \"Chaque image de TENSIL est une image de synthèse. La lampe a été construite par des scripts Python exécutés dans Blender 5.2, puis rendue avec Cycles.\\n\\n\" +\n      \"Les étapes : une maquette grise pour les volumes, le maillage détaillé avec les ressorts et les rotules, les matériaux, l'éclairage studio, puis les rendus finaux.\\n\\n\" +\n      `${s.key_message}.\\n\\n${cta}.`,\n    caption: `Maquette grise, maillage, matériaux, lumière : TENSIL est une image de synthèse, construite étape par étape dans Blender. ${cta}.`,\n    hashtags: ['#TENSIL', '#Blender', '#Coulisses', '#Modelisation3D'],\n    visual: { title: 'Construite par le code', subtitle: 'Maillage du modèle 3D, scripts Python et Blender' },\n  }),\n  coloris: () => ({\n    hooks: ['Graphite, Sauge, Oxyde ou Crème : laquelle pour votre bureau ?', 'Quatre laques pour une même lampe : votre choix ?'],\n    body: 'TENSIL existe en 4 coloris de laque :\\n• Graphite, presque noir ;\\n• Sauge, un vert gris doux ;\\n• Oxyde, un rouge brique ;\\n• Crème, un blanc cassé.\\n\\n' +\n      `Les rotules restent en laiton sur chaque coloris.\\n\\n${s.key_message}.\\n\\nDites-nous en commentaire quel coloris vous placeriez sur votre bureau.`,\n    caption: '4 laques, les mêmes rotules en laiton. Graphite, Sauge, Oxyde ou Crème ? Répondez en commentaire.',\n    hashtags: ['#TENSIL', '#Coloris', '#DesignProduit', '#VotreAvis'],\n    visual: { title: 'Laquelle choisiriez-vous ?', subtitle: 'Graphite, Sauge, Oxyde, Crème' },\n  }),\n  boutique: () => ({\n    hooks: ['La boutique de démonstration TENSIL est en ligne', 'TENSIL se manipule à 360° dans sa boutique de démo'],\n    body: 'On peut y faire tourner la lampe en 3D à 360°, changer de coloris en direct et suivre un parcours de commande complet.\\n\\n' +\n      \"Ce parcours est simulé : TENSIL est une marque fictive, aucun paiement n'est demandé et aucune commande n'est réelle.\\n\\n\" +\n      `${s.key_message}.\\n\\n${cta}.`,\n    caption: `Vue 3D à 360°, 4 coloris, commande simulée : rien n'est vendu, tout se manipule. ${cta}.`,\n    hashtags: ['#TENSIL', '#Ecommerce', '#WebGL', '#Boutique3D'],\n    visual: { title: 'À voir sous tous les angles', subtitle: 'Boutique de démonstration · vue 3D à 360°' },\n  }),\n};\nconst t = TEMPLATES[s.angle]();\nconst hook = it.mock_case === 'repeat' && it.history_hooks.length ? it.history_hooks[0] : t.hooks[alt];\nconst post = {\n  hook,\n  linkedin_text: `${hook}\\n\\n${t.body}`,\n  instagram_caption: `${hook}\\n\\n${t.caption}`,\n  hashtags: t.hashtags,\n  visual: t.visual,\n};\n// 'claim': first answer promises a price and availability (forbidden for a fictive product), the retry is clean.\nif (it.mock_case === 'claim' && it.attempt === 1) post.linkedin_text += '\\n\\nDisponible dès maintenant à 249 €.';\n\nlet raw;\nif (it.mock_case === 'invalid_json' || (it.mock_case === 'invalid_once' && it.attempt === 1)) {\n  raw = '{\"hook\": \"Réponse tronquée par le fournisseur...';\n} else {\n  raw = JSON.stringify(post);\n}\nreturn [{ json: { ...it, raw_response: raw } }];"
       }
     },
     {
-      "id": "7c59a546-de84-553e-ac52-d22b0a638ade",
+      "id": "5f040b8f-d86d-5fa7-b51d-4e9a6a6fabe6",
       "name": "Valider la réponse",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -265,11 +265,11 @@
         220
       ],
       "parameters": {
-        "jsCode": "// Validate the AI output (schema, lengths, platform limits) and check repetition.\n// check = ok | retry | fail\nconst it = $input.first().json;\nconst cfg = it.config;\nconst errors = [];\nlet data = null;\n\nif (it.mode === 'live') {\n  if (it.error) errors.push('API : ' + String(it.error.message || JSON.stringify(it.error)).slice(0, 200));\n  else {\n    try { data = JSON.parse(it.choices?.[0]?.message?.content ?? ''); } catch (e) { errors.push('JSON invalide'); }\n  }\n} else {\n  try { data = JSON.parse(it.raw_response); } catch (e) { errors.push('JSON invalide'); }\n}\n\nconst str = (v, min, max, label) => {\n  if (typeof v !== 'string') return errors.push(`${label} manquant`);\n  if (v.length < min || v.length > max) errors.push(`${label} : ${v.length} caractères (attendu ${min}–${max})`);\n};\nif (data) {\n  str(data.hook, 10, 90, 'hook');\n  str(data.linkedin_text, 100, 1300, 'linkedin_text');           // LinkedIn max 3000\n  str(data.instagram_caption, 50, 600, 'instagram_caption');     // Instagram max 2200\n  str(data.visual?.title, 1, 40, 'visual.title');\n  str(data.visual?.subtitle ?? '', 0, 80, 'visual.subtitle');\n  const tags = data.hashtags;\n  if (!Array.isArray(tags) || tags.length < 3 || tags.length > 8) errors.push('hashtags : 3 à 8 attendus'); // Instagram max 30\n  else if (tags.some((t) => !/^#[\\p{L}\\p{N}_]+$/u.test(t))) errors.push('hashtags : format #MotSansEspace');\n}\n\nconst norm = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')\n  .replace(/[^a-z0-9 ]/g, ' ').split(/\\s+/).filter((w) => w.length > 2);\nconst jaccard = (a, b) => {\n  const A = new Set(norm(a)), B = new Set(norm(b));\n  if (!A.size || !B.size) return 0;\n  const inter = [...A].filter((x) => B.has(x)).length;\n  return inter / (A.size + B.size - inter);\n};\nlet similar_hook = '';\nif (!errors.length) {\n  for (const h of it.history_hooks) {\n    if (jaccard(data.hook, h) >= cfg.similarity_threshold) { similar_hook = h; break; }\n  }\n}\n\nconst canRetry = it.attempt < cfg.max_attempts;\nlet check = 'ok', retry_hint = '', needs_review = false;\nif (errors.length) {\n  check = canRetry ? 'retry' : 'fail';\n  retry_hint = `Ta réponse précédente était invalide (${errors.join(' ; ')}). Respecte strictement le schéma et les longueurs.`;\n} else if (similar_hook) {\n  if (canRetry) { check = 'retry'; retry_hint = `L'accroche « ${similar_hook} » est déjà utilisée : propose une accroche nettement différente.`; }\n  else needs_review = true;\n}\n\nreturn [{ json: {\n  config: cfg, date: it.date, mode: it.mode, mock_case: it.mock_case, slot: it.slot,\n  history_hooks: it.history_hooks, system_prompt: it.system_prompt, user_prompt: it.user_prompt,\n  attempt: check === 'retry' ? it.attempt + 1 : it.attempt,\n  check, errors, retry_hint, needs_review, similar_hook, content: errors.length ? null : data,\n} }];"
+        "jsCode": "const ANGLES = ['devoilement', 'anatomie', 'coulisses', 'coloris', 'boutique'];\nconst ANGLE_LABELS = { devoilement: 'Dévoilement', anatomie: 'Anatomie', coulisses: 'Coulisses', coloris: 'Coloris', boutique: 'La boutique' };\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst PRODUCT_FACTS = [\n  \"TENSIL est une marque fictive, créée pour un projet de portfolio. La lampe n'est pas commercialisée.\",\n  'Lampe de bureau articulée : bras en deux segments de 30 cm, soit 60 cm de portée.',\n  'Ressorts équilibreurs : 2 ressorts par segment compensent le poids du bras, sans molette à serrer.',\n  'Le principe des ressorts équilibreurs est connu depuis les années 1930 ; TENSIL le réinterprète avec une silhouette propre.',\n  'Base en disque lestée de 22 cm de diamètre ; hauteur de 43 cm en position de travail.',\n  'Abat-jour conique de 15 cm de diamètre, avec réflecteur interne.',\n  'Matériaux représentés : acier laqué verni (bras, base, abat-jour), laiton brossé (rotules), acier poli (ressorts), câble en caoutchouc.',\n  '4 coloris de laque : Graphite (presque noir), Sauge (vert gris doux), Oxyde (rouge brique), Crème (blanc cassé).',\n  'Toutes les images sont des images de synthèse : modèle 3D construit par scripts Python dans Blender 5.2, sans modélisation manuelle, rendu avec Cycles.',\n  \"Un film de 8 s montre la lampe qui se déplie puis s'allume.\",\n  'Une boutique de démonstration est en ligne : vue 3D à 360°, changement de coloris en direct, parcours de commande simulé, sans paiement ni vente.',\n];\n\n// Claims a fictive, unsold product cannot make. Checked on the brief (A) and on every AI output (B). Not exhaustive.\nconst CLAIMS = [\n  ['prix', /€|\\bprix\\b|\\beuros?\\b|\\btarif/],\n  ['vente', /\\ben vente\\b|\\bachetez\\b|\\bcommandez\\b|\\bprecommand|\\ben stock\\b|\\bdisponibles?\\b|\\bpromo|\\bsoldes?\\b/],\n  ['livraison', /\\blivraison/],\n  ['caractéristique non documentée', /\\bled\\b|\\blumens?\\b|\\bkelvins?\\b|\\bwatts?\\b|\\bdimmable|\\bvariateur|\\bbatterie|\\busb\\b|\\bsans fil\\b|\\bcapteur/],\n  ['garantie', /\\bgaranti|\\brembours|\\bcertifi|\\bnormes?\\b/],\n  ['origine ou engagement non vérifié', /\\bfait main\\b|\\ba la main\\b|\\bartisan|\\bfabriquee? en\\b|\\bmade in\\b|\\becolog|\\beco-?respons|\\brecycl|\\bdurable/],\n  ['superlatif', /\\bn°\\s?1\\b|\\bnumero un\\b|\\bmeilleure?s?\\b|\\brevolutionnaire|\\bincomparable|\\bunique au monde/],\n  ['confort visuel non vérifié', /\\beblou|\\bfatigue visuelle/],\n];\nconst normText = (s) => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');\nconst findClaims = (text) => CLAIMS\n  .map(([label, re]) => { const m = normText(text).match(re); return m ? `${label} (« ${m[0]} »)` : null; })\n  .filter(Boolean);\n\n// Every number written must come from the product facts (0 and 1 are always allowed). Decimals are one number (1,2 ≠ 1 and 2).\nconst numbersIn = (text) => (String(text ?? '').match(/\\d+(?:[.,]\\d+)?/g) || []).map((n) => n.replace(',', '.'));\nconst FACT_NUMBERS = new Set(['0', '1', ...numbersIn(PRODUCT_FACTS.join(' '))]);\nconst unverifiedNumbers = (text) => [...new Set(numbersIn(text).filter((n) => !FACT_NUMBERS.has(n)))];\n\n// Validate the AI output: schema, lengths, platform limits, forbidden claims, unverified numbers, repetition.\n// check = ok | retry | fail\nconst it = $input.first().json;\nconst cfg = it.config;\nconst errors = [];\nlet data = null;\n\nif (it.mode === 'live') {\n  if (it.error) errors.push('API : ' + String(it.error.message || JSON.stringify(it.error)).slice(0, 200));\n  else {\n    try { data = JSON.parse(it.choices?.[0]?.message?.content ?? ''); } catch (e) { errors.push('JSON invalide'); }\n  }\n} else {\n  try { data = JSON.parse(it.raw_response); } catch (e) { errors.push('JSON invalide'); }\n}\n\nconst str = (v, min, max, label) => {\n  if (typeof v !== 'string') return errors.push(`${label} manquant`);\n  if (v.length < min || v.length > max) errors.push(`${label} : ${v.length} caractères (attendu ${min}–${max})`);\n};\nif (data) {\n  str(data.hook, 10, 90, 'hook');\n  str(data.linkedin_text, 100, 1300, 'linkedin_text');           // LinkedIn max 3000\n  str(data.instagram_caption, 50, 600, 'instagram_caption');     // Instagram max 2200\n  str(data.visual?.title, 1, 40, 'visual.title');\n  str(data.visual?.subtitle ?? '', 0, 80, 'visual.subtitle');\n  const tags = data.hashtags;\n  if (!Array.isArray(tags) || tags.length < 3 || tags.length > 8) errors.push('hashtags : 3 à 8 attendus'); // Instagram max 30\n  else if (tags.some((t) => !/^#[\\p{L}\\p{N}_]+$/u.test(t))) errors.push('hashtags : format #MotSansEspace');\n  if (it.slot.angle === 'anatomie' && typeof data.visual?.title === 'string' && (data.visual.title.length > 14 || !/\\d/.test(data.visual.title)))\n    errors.push('visual.title (anatomie) : un chiffre, 14 caractères maximum');\n  if (!errors.length) {\n    const all = [data.hook, data.linkedin_text, data.instagram_caption, data.hashtags.join(' '), data.visual.title, data.visual.subtitle].join('\\n');\n    for (const c of findClaims(all)) errors.push(`promesse interdite : ${c}`);\n    const nums = unverifiedNumbers(all);\n    if (nums.length) errors.push(`chiffre absent de la fiche produit : ${nums.join(', ')}`);\n  }\n}\n\nconst norm = (s) => normText(s).replace(/[^a-z0-9 ]/g, ' ').split(/\\s+/).filter((w) => w.length > 2);\nconst jaccard = (a, b) => {\n  const A = new Set(norm(a)), B = new Set(norm(b));\n  if (!A.size || !B.size) return 0;\n  const inter = [...A].filter((x) => B.has(x)).length;\n  return inter / (A.size + B.size - inter);\n};\nlet similar_hook = '';\nif (!errors.length) {\n  for (const h of it.history_hooks) {\n    if (jaccard(data.hook, h) >= cfg.similarity_threshold) { similar_hook = h; break; }\n  }\n}\n\nconst canRetry = it.attempt < cfg.max_attempts;\nlet check = 'ok', retry_hint = '', needs_review = false;\nif (errors.length) {\n  check = canRetry ? 'retry' : 'fail';\n  retry_hint = `Ta réponse précédente a été refusée (${errors.join(' ; ')}). Respecte strictement le schéma, les longueurs et la fiche produit.`;\n} else if (similar_hook) {\n  if (canRetry) { check = 'retry'; retry_hint = `L'accroche « ${similar_hook} » est déjà utilisée : propose une accroche nettement différente.`; }\n  else needs_review = true;\n}\nconst attempts_log = [...(it.attempts_log || []), { attempt: it.attempt, result: check, errors, similar_hook: similar_hook || null }];\n\nreturn [{ json: {\n  config: cfg, date: it.date, mode: it.mode, mock_case: it.mock_case, slot: it.slot, asset: it.asset,\n  history_hooks: it.history_hooks, system_prompt: it.system_prompt, user_prompt: it.user_prompt,\n  attempt: check === 'retry' ? it.attempt + 1 : it.attempt, attempts_log,\n  check, errors, retry_hint, needs_review, similar_hook, post: errors.length ? null : data,\n} }];"
       }
     },
     {
-      "id": "87a2e554-28bf-59d9-8906-97fc2f5c2f01",
+      "id": "aa19e9d4-e1af-5dbf-a79d-ff6317108926",
       "name": "Résultat",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
@@ -358,25 +358,71 @@
       }
     },
     {
-      "id": "06eb10cd-01af-5ae2-b0a3-87bbcb770a16",
+      "id": "7bda65d7-8903-5908-bf1d-eb9c3ddc1fc2",
+      "name": "Lire le rendu (GitHub)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "position": [
+        2420,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $json.asset.repo }}/contents/{{ $json.asset.path }}?ref={{ $json.asset.ref }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "User-Agent",
+              "value": "n8n-tensil-demo"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      }
+    },
+    {
+      "id": "da4ba112-1e49-5361-beb4-71dc0f7c8fda",
+      "name": "Réunir texte + rendu",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2640,
+        100
+      ],
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      }
+    },
+    {
+      "id": "742f71c4-1b09-5c3f-aba5-304abc533579",
       "name": "Construire les fichiers",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2420,
+        2860,
         100
       ],
       "parameters": {
-        "jsCode": "const ANGLES = ['chiffre', 'astuce', 'coulisses', 'question', 'produit'];\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst BRAND = { navy: '#1B3A4B', amber: '#F2A541', cream: '#F6EFE6', name: 'CAFÉ LUMEN' };\nconst LABELS = { chiffre: 'LE CHIFFRE', astuce: 'ASTUCE', coulisses: 'COULISSES', question: 'ET VOUS ?', produit: 'NOUVEAUTÉ' };\n\nfunction esc(s) {\n  return String(s ?? '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&apos;' }[c]));\n}\n\nfunction wrap(text, max) {\n  const lines = [];\n  let cur = '';\n  for (const w of String(text ?? '').split(/\\s+/).filter(Boolean)) {\n    if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }\n    else cur = (cur + ' ' + w).trim();\n  }\n  if (cur) lines.push(cur);\n  return lines;\n}\n\nfunction renderSvg(angle, visual) {\n  const W = 1080, H = 1350;\n  const big = angle === 'chiffre';\n  const size = big ? 170 : 88;\n  const lh = Math.round(size * 1.12);\n  const tLines = wrap(visual.title, big ? 9 : 17).slice(0, 4);\n  const sLines = wrap(visual.subtitle, 32).slice(0, 3);\n  const y0 = big ? 640 : 560;\n  const title = tLines.map((l, i) =>\n    `<text x=\"96\" y=\"${y0 + i * lh}\" font-family=\"Georgia, 'Times New Roman', serif\" font-size=\"${size}\" font-weight=\"700\" fill=\"${BRAND.cream}\">${esc(l)}</text>`).join('\\n');\n  const sy = y0 + tLines.length * lh + 40;\n  const sub = sLines.map((l, i) =>\n    `<text x=\"96\" y=\"${sy + i * 58}\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"44\" fill=\"${BRAND.cream}\" fill-opacity=\"0.85\">${esc(l)}</text>`).join('\\n');\n  return `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${W}\" height=\"${H}\" viewBox=\"0 0 ${W} ${H}\">\n<rect width=\"${W}\" height=\"${H}\" fill=\"${BRAND.navy}\"/>\n<circle cx=\"${W - 60}\" cy=\"140\" r=\"260\" fill=\"${BRAND.amber}\" fill-opacity=\"0.12\"/>\n<rect x=\"96\" y=\"200\" width=\"120\" height=\"12\" fill=\"${BRAND.amber}\"/>\n<text x=\"96\" y=\"300\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"40\" font-weight=\"700\" letter-spacing=\"8\" fill=\"${BRAND.amber}\">${esc(LABELS[angle] || '')}</text>\n${title}\n${sub}\n<rect x=\"0\" y=\"${H - 150}\" width=\"${W}\" height=\"150\" fill=\"${BRAND.amber}\"/>\n<text x=\"96\" y=\"${H - 62}\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"44\" font-weight=\"700\" letter-spacing=\"6\" fill=\"${BRAND.navy}\">${BRAND.name}</text>\n<text x=\"${W - 96}\" y=\"${H - 66}\" text-anchor=\"end\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"26\" fill=\"${BRAND.navy}\">Marque fictive · démo</text>\n</svg>`;\n}\n\nfunction fileItem(path, content, mimeType, json = {}) {\n  const fileName = path.split('/').pop();\n  return { json: { ...json, path }, binary: { data: { data: Buffer.from(content, 'utf8').toString('base64'), mimeType, fileName } } };\n}\n\nfunction linkedinMd(s, c) {\n  return `# LinkedIn — ${s.date} (${s.angle})\\n\\n${c.linkedin_text}\\n`;\n}\n\nfunction instagramMd(s, c) {\n  return `# Instagram — ${s.date} (${s.angle})\\n\\n${c.instagram_caption}\\n\\n${(c.hashtags || []).join(' ')}\\n`;\n}\n\n// Flat layout: n8n's file node does not create folders, so week/day/angle go in the file name.\nfunction slotPrefix(s) {\n  return `${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${s.angle}`;\n}\n\n// Write the day's deliverables + meta, status to_review (or needs_review).\nconst it = $input.first().json;\nconst s = it.slot, c = it.content;\nconst dir = `${it.config.base_path}/output/${slotPrefix(s)}`;\nconst status = it.needs_review ? 'needs_review' : 'to_review';\nconst svg = renderSvg(s.angle, c.visual);\nconst review_url = $execution.resumeFormUrl;\nconst meta = {\n  brand: 'Café Lumen (fictive)', week_id: s.week_id, date: s.date, angle: s.angle, status, mode: it.mode,\n  attempts: it.attempt, similar_hook: it.similar_hook || null, review_url,\n  execution_id: $execution.id, generated_at: new Date().toISOString(), prompt_version: 'v1',\n};\nconst shared = { slot_id: s.id, slot: s, content: c, status, svg, review_url, mode: it.mode,\n  similar_hook: it.similar_hook, base_path: it.config.base_path };\nreturn [\n  fileItem(`${dir}_linkedin.md`, linkedinMd(s, c), 'text/markdown', shared),\n  fileItem(`${dir}_instagram_caption.md`, instagramMd(s, c), 'text/markdown'),\n  fileItem(`${dir}_instagram_1080x1350.svg`, svg, 'image/svg+xml'),\n  fileItem(`${dir}_meta.json`, JSON.stringify(meta, null, 2), 'application/json'),\n];"
+        "jsCode": "const ANGLES = ['devoilement', 'anatomie', 'coulisses', 'coloris', 'boutique'];\nconst ANGLE_LABELS = { devoilement: 'Dévoilement', anatomie: 'Anatomie', coulisses: 'Coulisses', coloris: 'Coloris', boutique: 'La boutique' };\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst BRAND = { paper: '#efebe4', sunk: '#e6e1d8', ink: '#171614', soft: '#57534c', signal: '#a8432a', name: 'TENSIL' };\nconst DISPLAY = \"'Archivo Narrow', Archivo, 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif\";\nconst MONO = \"'Azeret Mono', Consolas, 'Courier New', monospace\";\nconst DISCLAIMER = 'Démo portfolio · TENSIL est une marque fictive · contenu préparé pour validation humaine, jamais publié.';\n\nfunction esc(s) {\n  return String(s ?? '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&apos;' }[c]));\n}\n\nfunction wrap(text, max) {\n  const lines = [];\n  let cur = '';\n  for (const w of String(text ?? '').split(/\\s+/).filter(Boolean)) {\n    if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }\n    else cur = (cur + ' ' + w).trim();\n  }\n  if (cur) lines.push(cur);\n  return lines;\n}\n\n// Same number of lines as wrap(), but with lengths evened out (no single word left on the last line).\nfunction balance(text, max) {\n  const n = wrap(text, max).length;\n  for (let m = Math.ceil(String(text ?? '').length / n); m < max; m++) {\n    const lines = wrap(text, m);\n    if (lines.length === n) return lines;\n  }\n  return wrap(text, max);\n}\n\n// 1080x1350 (4:5): Blender render on top (16:9), text block below, in the TENSIL store art direction.\nfunction renderSvg(slot, visual, image, assetName) {\n  const W = 1080, H = 1350, IMG_H = 680, X = 96, BOTTOM = 1176;\n  const big = slot.angle === 'anatomie';\n  const size = big ? 132 : 84;\n  const lh = Math.round(size * 1.04);\n  const tLines = balance(visual.title, big ? 14 : 22).slice(0, big ? 2 : 3);\n  const sLines = balance(visual.subtitle, 50).slice(0, 2);\n  // Text block anchored to the bottom, above the footer rule.\n  const sy = BOTTOM - (sLines.length - 1) * 50;\n  const yLast = sLines.length ? sy - 72 : BOTTOM;\n  const y0 = yLast - (tLines.length - 1) * lh;\n  const labelY = y0 - Math.round(size * 0.85) - 56;\n  const title = tLines.map((l, i) =>\n    `<text x=\"${X}\" y=\"${y0 + i * lh}\" font-family=\"${DISPLAY}\" font-stretch=\"condensed\" font-size=\"${size}\" font-weight=\"700\" fill=\"${BRAND.ink}\">${esc(l)}</text>`).join('\\n');\n  const sub = sLines.map((l, i) =>\n    `<text x=\"${X}\" y=\"${sy + i * 50}\" font-family=\"${DISPLAY}\" font-size=\"38\" fill=\"${BRAND.soft}\">${esc(l)}</text>`).join('\\n');\n  const picture = image\n    ? `<image href=\"${image}\" x=\"0\" y=\"0\" width=\"${W}\" height=\"${IMG_H}\" preserveAspectRatio=\"xMidYMid slice\"/>`\n    : `<rect width=\"${W}\" height=\"${IMG_H}\" fill=\"${BRAND.sunk}\"/>\n<text x=\"${W / 2}\" y=\"${IMG_H / 2}\" text-anchor=\"middle\" font-family=\"${MONO}\" font-size=\"28\" fill=\"${BRAND.soft}\">Rendu indisponible</text>`;\n  return `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${W}\" height=\"${H}\" viewBox=\"0 0 ${W} ${H}\">\n<rect width=\"${W}\" height=\"${H}\" fill=\"${BRAND.paper}\"/>\n${picture}\n<text x=\"${W - X}\" y=\"${IMG_H + 36}\" text-anchor=\"end\" font-family=\"${MONO}\" font-size=\"20\" fill=\"${BRAND.soft}\">Image de synthèse · Blender · ${esc(assetName)}</text>\n<line x1=\"${X}\" y1=\"${labelY - 8}\" x2=\"${X + 56}\" y2=\"${labelY - 8}\" stroke=\"${BRAND.ink}\" stroke-width=\"2\"/>\n<text x=\"${X + 76}\" y=\"${labelY}\" font-family=\"${MONO}\" font-size=\"26\" fill=\"${BRAND.ink}\"><tspan fill=\"${BRAND.signal}\">0${slot.day_index}</tspan>  ${esc(ANGLE_LABELS[slot.angle] || '')}</text>\n${title}\n${sub}\n<line x1=\"${X}\" y1=\"1232\" x2=\"${W - X}\" y2=\"1232\" stroke=\"${BRAND.ink}\" stroke-opacity=\"0.32\" stroke-width=\"2\"/>\n<text x=\"${X}\" y=\"1292\" font-family=\"'Inter', Arial, sans-serif\" font-size=\"40\" font-weight=\"600\" letter-spacing=\"10\" fill=\"${BRAND.ink}\">${BRAND.name}</text>\n<text x=\"${W - X}\" y=\"1288\" text-anchor=\"end\" font-family=\"${MONO}\" font-size=\"20\" fill=\"${BRAND.soft}\">Marque fictive · démo portfolio</text>\n</svg>`;\n}\n\nfunction fileItem(path, content, mimeType, json = {}) {\n  const fileName = path.split('/').pop();\n  return { json: { ...json, path }, binary: { data: { data: Buffer.from(content, 'utf8').toString('base64'), mimeType, fileName } } };\n}\n\nfunction linkedinMd(s, p) {\n  return `# LinkedIn — ${s.date} · ${ANGLE_LABELS[s.angle]} (TENSIL)\\n\\n${p.linkedin_text}\\n\\n---\\n${DISCLAIMER}\\n`;\n}\n\nfunction instagramMd(s, p) {\n  return `# Instagram — ${s.date} · ${ANGLE_LABELS[s.angle]} (TENSIL)\\n\\n${p.instagram_caption}\\n\\n${(p.hashtags || []).join(' ')}\\n\\n---\\n${DISCLAIMER}\\n`;\n}\n\nfunction briefOf(s) {\n  return { week_id: s.week_id, theme: s.theme, key_message: s.key_message, product: s.product || null, tone: s.tone, cta: s.cta || null };\n}\n\n// Flat layout: n8n's file node does not create folders, so week/day/angle go in the file name.\nfunction slotPrefix(s) {\n  return `${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${s.angle}`;\n}\n\n// Write the day's deliverables + meta. Status to_review, or needs_review when something needs a closer look.\nconst it = $input.first().json;   // validated post merged with the GitHub contents API response for the render\nconst s = it.slot, p = it.post;\nconst dir = `${it.config.base_path}/output/${slotPrefix(s)}`;\nconst assetName = it.asset.path.split('/').pop();\nconst hasImage = it.encoding === 'base64' && typeof it.content === 'string' && it.content.length > 100;\nconst image = hasImage ? `data:image/webp;base64,${it.content.replace(/\\s/g, '')}` : '';\nconst review_notes = [];\nif (it.needs_review) review_notes.push(`accroche proche de : « ${it.similar_hook} »`);\nif (!hasImage) review_notes.push(`rendu ${assetName} indisponible : visuel sans image`);\nconst status = review_notes.length ? 'needs_review' : 'to_review';\nconst svg = renderSvg(s, p.visual, image, assetName);\nconst review_url = $execution.resumeFormUrl;\nconst meta = {\n  brand: 'TENSIL (marque fictive, démo portfolio)',\n  brief: briefOf(s),\n  slot: { date: s.date, day: DAYS[s.day_index], angle: s.angle, angle_label: ANGLE_LABELS[s.angle] },\n  status, review_notes, mode: it.mode, prompt_version: it.config.prompt_version,\n  attempts: it.attempt, checks: it.attempts_log,\n  visual: {\n    file: `${slotPrefix(s)}_instagram_1080x1350.svg`, title: p.visual.title, subtitle: p.visual.subtitle,\n    render: { repo: it.asset.repo, ref: it.asset.ref, path: it.asset.path, embedded: hasImage,\n      source: `https://github.com/${it.asset.repo}/blob/${it.asset.ref}/${it.asset.path}` },\n  },\n  review_url, published: false, execution_id: $execution.id, generated_at: new Date().toISOString(),\n};\nconst shared = { slot_id: s.id, slot: s, post: p, status, reason: review_notes.join(' ; '), svg, review_url,\n  mode: it.mode, review_notes, base_path: it.config.base_path };\nreturn [\n  fileItem(`${dir}_linkedin.md`, linkedinMd(s, p), 'text/markdown', shared),\n  fileItem(`${dir}_instagram_caption.md`, instagramMd(s, p), 'text/markdown'),\n  fileItem(`${dir}_instagram_1080x1350.svg`, svg, 'image/svg+xml'),\n  fileItem(`${dir}_meta.json`, JSON.stringify(meta, null, 2), 'application/json'),\n];"
       }
     },
     {
-      "id": "90145ba8-88d0-5510-a185-a405ebd4d6f2",
+      "id": "d1f74cb2-ea96-5d2f-a169-6bab4dd9e5ed",
       "name": "Écrire les fichiers",
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        2640,
+        3080,
         100
       ],
       "parameters": {
@@ -387,13 +433,13 @@
       }
     },
     {
-      "id": "15c6e0b9-3db6-56e2-b51f-fa9bf3ca0f2b",
+      "id": "aa90b2c0-69f6-5feb-b282-e71fd3e292ae",
       "name": "Statut : à valider",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "executeOnce": true,
       "position": [
-        2860,
+        3300,
         100
       ],
       "parameters": {
@@ -401,19 +447,20 @@
         "operation": "update",
         "dataTableId": {
           "mode": "id",
-          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+          "value": "REPLACE_WITH_tensil_slots_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
             "status": "={{ $('Construire les fichiers').first().json.status }}",
-            "hook": "={{ $('Construire les fichiers').first().json.content.hook }}",
-            "linkedin_text": "={{ $('Construire les fichiers').first().json.content.linkedin_text }}",
-            "instagram_caption": "={{ $('Construire les fichiers').first().json.content.instagram_caption }}",
-            "hashtags": "={{ $('Construire les fichiers').first().json.content.hashtags.join(' ') }}",
-            "visual_title": "={{ $('Construire les fichiers').first().json.content.visual.title }}",
-            "visual_subtitle": "={{ $('Construire les fichiers').first().json.content.visual.subtitle }}",
+            "hook": "={{ $('Construire les fichiers').first().json.post.hook }}",
+            "linkedin_text": "={{ $('Construire les fichiers').first().json.post.linkedin_text }}",
+            "instagram_caption": "={{ $('Construire les fichiers').first().json.post.instagram_caption }}",
+            "hashtags": "={{ $('Construire les fichiers').first().json.post.hashtags.join(' ') }}",
+            "visual_title": "={{ $('Construire les fichiers').first().json.post.visual.title }}",
+            "visual_subtitle": "={{ $('Construire les fichiers').first().json.post.visual.subtitle }}",
             "review_url": "={{ $('Construire les fichiers').first().json.review_url }}",
+            "reason": "={{ $('Construire les fichiers').first().json.reason }}",
             "mode": "={{ $('Construire les fichiers').first().json.mode }}",
             "updated_at": "={{ $now.toISO() }}"
           },
@@ -500,6 +547,16 @@
               "removed": false
             },
             {
+              "id": "reason",
+              "displayName": "reason",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true,
+              "required": false,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
               "id": "mode",
               "displayName": "mode",
               "type": "string",
@@ -537,19 +594,19 @@
       }
     },
     {
-      "id": "fe9c57a2-e31a-5201-9f8b-4783ee4cab47",
+      "id": "75d1d498-b5a4-5e34-aa60-5491fd93ab90",
       "name": "Validation humaine",
-      "webhookId": "7ed167c2-f025-5b63-b0f7-3a931a3d75a6",
+      "webhookId": "b90e7055-34b0-550e-9335-5d6e856b0741",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3080,
+        3520,
         100
       ],
       "parameters": {
         "resume": "form",
-        "formTitle": "=Café Lumen — post du {{ $('Construire les fichiers').first().json.slot.date }}",
-        "formDescription": "=Angle : {{ $('Construire les fichiers').first().json.slot.angle }}{{ $('Construire les fichiers').first().json.status === 'needs_review' ? ' — ⚠ accroche proche de : ' + $('Construire les fichiers').first().json.similar_hook : '' }}\n\nLINKEDIN\n{{ $('Construire les fichiers').first().json.content.linkedin_text }}\n\nINSTAGRAM\n{{ $('Construire les fichiers').first().json.content.instagram_caption }}\n{{ $('Construire les fichiers').first().json.content.hashtags.join(' ') }}",
+        "formTitle": "=TENSIL — post du {{ $('Construire les fichiers').first().json.slot.date }}",
+        "formDescription": "=Angle : {{ $('Construire les fichiers').first().json.slot.angle }}{{ $('Construire les fichiers').first().json.review_notes.length ? ' — ⚠ à vérifier : ' + $('Construire les fichiers').first().json.review_notes.join(' ; ') : '' }}\n\nLINKEDIN\n{{ $('Construire les fichiers').first().json.post.linkedin_text }}\n\nINSTAGRAM\n{{ $('Construire les fichiers').first().json.post.instagram_caption }}\n{{ $('Construire les fichiers').first().json.post.hashtags.join(' ') }}\n\nVISUEL : {{ $('Construire les fichiers').first().json.post.visual.title }} — fichier SVG dans output/ (workflow T pour le consulter).\nTENSIL est une marque fictive : approuver range le post dans outbox/, rien n'est publié.",
         "formFields": {
           "values": [
             {
@@ -577,25 +634,25 @@
       }
     },
     {
-      "id": "96d7f8fd-845a-54ba-bfd7-f3684b84bf5a",
+      "id": "d2a9b573-f6cb-5606-ab09-da0f58b34a48",
       "name": "Appliquer la décision",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3300,
+        3740,
         100
       ],
       "parameters": {
-        "jsCode": "const ANGLES = ['chiffre', 'astuce', 'coulisses', 'question', 'produit'];\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst BRAND = { navy: '#1B3A4B', amber: '#F2A541', cream: '#F6EFE6', name: 'CAFÉ LUMEN' };\nconst LABELS = { chiffre: 'LE CHIFFRE', astuce: 'ASTUCE', coulisses: 'COULISSES', question: 'ET VOUS ?', produit: 'NOUVEAUTÉ' };\n\nfunction esc(s) {\n  return String(s ?? '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&apos;' }[c]));\n}\n\nfunction wrap(text, max) {\n  const lines = [];\n  let cur = '';\n  for (const w of String(text ?? '').split(/\\s+/).filter(Boolean)) {\n    if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }\n    else cur = (cur + ' ' + w).trim();\n  }\n  if (cur) lines.push(cur);\n  return lines;\n}\n\nfunction renderSvg(angle, visual) {\n  const W = 1080, H = 1350;\n  const big = angle === 'chiffre';\n  const size = big ? 170 : 88;\n  const lh = Math.round(size * 1.12);\n  const tLines = wrap(visual.title, big ? 9 : 17).slice(0, 4);\n  const sLines = wrap(visual.subtitle, 32).slice(0, 3);\n  const y0 = big ? 640 : 560;\n  const title = tLines.map((l, i) =>\n    `<text x=\"96\" y=\"${y0 + i * lh}\" font-family=\"Georgia, 'Times New Roman', serif\" font-size=\"${size}\" font-weight=\"700\" fill=\"${BRAND.cream}\">${esc(l)}</text>`).join('\\n');\n  const sy = y0 + tLines.length * lh + 40;\n  const sub = sLines.map((l, i) =>\n    `<text x=\"96\" y=\"${sy + i * 58}\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"44\" fill=\"${BRAND.cream}\" fill-opacity=\"0.85\">${esc(l)}</text>`).join('\\n');\n  return `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${W}\" height=\"${H}\" viewBox=\"0 0 ${W} ${H}\">\n<rect width=\"${W}\" height=\"${H}\" fill=\"${BRAND.navy}\"/>\n<circle cx=\"${W - 60}\" cy=\"140\" r=\"260\" fill=\"${BRAND.amber}\" fill-opacity=\"0.12\"/>\n<rect x=\"96\" y=\"200\" width=\"120\" height=\"12\" fill=\"${BRAND.amber}\"/>\n<text x=\"96\" y=\"300\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"40\" font-weight=\"700\" letter-spacing=\"8\" fill=\"${BRAND.amber}\">${esc(LABELS[angle] || '')}</text>\n${title}\n${sub}\n<rect x=\"0\" y=\"${H - 150}\" width=\"${W}\" height=\"150\" fill=\"${BRAND.amber}\"/>\n<text x=\"96\" y=\"${H - 62}\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"44\" font-weight=\"700\" letter-spacing=\"6\" fill=\"${BRAND.navy}\">${BRAND.name}</text>\n<text x=\"${W - 96}\" y=\"${H - 66}\" text-anchor=\"end\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"26\" fill=\"${BRAND.navy}\">Marque fictive · démo</text>\n</svg>`;\n}\n\nfunction fileItem(path, content, mimeType, json = {}) {\n  const fileName = path.split('/').pop();\n  return { json: { ...json, path }, binary: { data: { data: Buffer.from(content, 'utf8').toString('base64'), mimeType, fileName } } };\n}\n\nfunction linkedinMd(s, c) {\n  return `# LinkedIn — ${s.date} (${s.angle})\\n\\n${c.linkedin_text}\\n`;\n}\n\nfunction instagramMd(s, c) {\n  return `# Instagram — ${s.date} (${s.angle})\\n\\n${c.instagram_caption}\\n\\n${(c.hashtags || []).join(' ')}\\n`;\n}\n\n// Flat layout: n8n's file node does not create folders, so week/day/angle go in the file name.\nfunction slotPrefix(s) {\n  return `${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${s.angle}`;\n}\n\n// Apply the human decision: approved -> outbox/, rejected -> rejected/ with the reason.\nconst f = $('Construire les fichiers').first().json;\nconst answer = $input.first().json;\nconst s = f.slot, c = f.content;\nconst approved = String(answer['Décision'] || '').toLowerCase().startsWith('approuv');\nconst reason = String(answer['Motif (si rejet)'] || '').trim() || (approved ? '' : '(non précisé)');\nconst status = approved ? 'approved' : 'rejected';\nconst dir = `${f.base_path}/${approved ? 'outbox' : 'rejected'}/${slotPrefix(s)}`;\nconst decision = { status, reason: reason || null, decided_at: new Date().toISOString(), execution_id: $execution.id };\nconst items = [\n  fileItem(`${dir}_linkedin.md`, linkedinMd(s, c), 'text/markdown', { slot_id: s.id, status, reason }),\n  fileItem(`${dir}_instagram_caption.md`, instagramMd(s, c), 'text/markdown'),\n  fileItem(`${dir}_decision.json`, JSON.stringify(decision, null, 2), 'application/json'),\n];\nif (approved) items.push(fileItem(`${dir}_instagram_1080x1350.svg`, f.svg, 'image/svg+xml'));\nreturn items;"
+        "jsCode": "const ANGLES = ['devoilement', 'anatomie', 'coulisses', 'coloris', 'boutique'];\nconst ANGLE_LABELS = { devoilement: 'Dévoilement', anatomie: 'Anatomie', coulisses: 'Coulisses', coloris: 'Coloris', boutique: 'La boutique' };\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst BRAND = { paper: '#efebe4', sunk: '#e6e1d8', ink: '#171614', soft: '#57534c', signal: '#a8432a', name: 'TENSIL' };\nconst DISPLAY = \"'Archivo Narrow', Archivo, 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif\";\nconst MONO = \"'Azeret Mono', Consolas, 'Courier New', monospace\";\nconst DISCLAIMER = 'Démo portfolio · TENSIL est une marque fictive · contenu préparé pour validation humaine, jamais publié.';\n\nfunction esc(s) {\n  return String(s ?? '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&apos;' }[c]));\n}\n\nfunction wrap(text, max) {\n  const lines = [];\n  let cur = '';\n  for (const w of String(text ?? '').split(/\\s+/).filter(Boolean)) {\n    if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }\n    else cur = (cur + ' ' + w).trim();\n  }\n  if (cur) lines.push(cur);\n  return lines;\n}\n\n// Same number of lines as wrap(), but with lengths evened out (no single word left on the last line).\nfunction balance(text, max) {\n  const n = wrap(text, max).length;\n  for (let m = Math.ceil(String(text ?? '').length / n); m < max; m++) {\n    const lines = wrap(text, m);\n    if (lines.length === n) return lines;\n  }\n  return wrap(text, max);\n}\n\n// 1080x1350 (4:5): Blender render on top (16:9), text block below, in the TENSIL store art direction.\nfunction renderSvg(slot, visual, image, assetName) {\n  const W = 1080, H = 1350, IMG_H = 680, X = 96, BOTTOM = 1176;\n  const big = slot.angle === 'anatomie';\n  const size = big ? 132 : 84;\n  const lh = Math.round(size * 1.04);\n  const tLines = balance(visual.title, big ? 14 : 22).slice(0, big ? 2 : 3);\n  const sLines = balance(visual.subtitle, 50).slice(0, 2);\n  // Text block anchored to the bottom, above the footer rule.\n  const sy = BOTTOM - (sLines.length - 1) * 50;\n  const yLast = sLines.length ? sy - 72 : BOTTOM;\n  const y0 = yLast - (tLines.length - 1) * lh;\n  const labelY = y0 - Math.round(size * 0.85) - 56;\n  const title = tLines.map((l, i) =>\n    `<text x=\"${X}\" y=\"${y0 + i * lh}\" font-family=\"${DISPLAY}\" font-stretch=\"condensed\" font-size=\"${size}\" font-weight=\"700\" fill=\"${BRAND.ink}\">${esc(l)}</text>`).join('\\n');\n  const sub = sLines.map((l, i) =>\n    `<text x=\"${X}\" y=\"${sy + i * 50}\" font-family=\"${DISPLAY}\" font-size=\"38\" fill=\"${BRAND.soft}\">${esc(l)}</text>`).join('\\n');\n  const picture = image\n    ? `<image href=\"${image}\" x=\"0\" y=\"0\" width=\"${W}\" height=\"${IMG_H}\" preserveAspectRatio=\"xMidYMid slice\"/>`\n    : `<rect width=\"${W}\" height=\"${IMG_H}\" fill=\"${BRAND.sunk}\"/>\n<text x=\"${W / 2}\" y=\"${IMG_H / 2}\" text-anchor=\"middle\" font-family=\"${MONO}\" font-size=\"28\" fill=\"${BRAND.soft}\">Rendu indisponible</text>`;\n  return `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${W}\" height=\"${H}\" viewBox=\"0 0 ${W} ${H}\">\n<rect width=\"${W}\" height=\"${H}\" fill=\"${BRAND.paper}\"/>\n${picture}\n<text x=\"${W - X}\" y=\"${IMG_H + 36}\" text-anchor=\"end\" font-family=\"${MONO}\" font-size=\"20\" fill=\"${BRAND.soft}\">Image de synthèse · Blender · ${esc(assetName)}</text>\n<line x1=\"${X}\" y1=\"${labelY - 8}\" x2=\"${X + 56}\" y2=\"${labelY - 8}\" stroke=\"${BRAND.ink}\" stroke-width=\"2\"/>\n<text x=\"${X + 76}\" y=\"${labelY}\" font-family=\"${MONO}\" font-size=\"26\" fill=\"${BRAND.ink}\"><tspan fill=\"${BRAND.signal}\">0${slot.day_index}</tspan>  ${esc(ANGLE_LABELS[slot.angle] || '')}</text>\n${title}\n${sub}\n<line x1=\"${X}\" y1=\"1232\" x2=\"${W - X}\" y2=\"1232\" stroke=\"${BRAND.ink}\" stroke-opacity=\"0.32\" stroke-width=\"2\"/>\n<text x=\"${X}\" y=\"1292\" font-family=\"'Inter', Arial, sans-serif\" font-size=\"40\" font-weight=\"600\" letter-spacing=\"10\" fill=\"${BRAND.ink}\">${BRAND.name}</text>\n<text x=\"${W - X}\" y=\"1288\" text-anchor=\"end\" font-family=\"${MONO}\" font-size=\"20\" fill=\"${BRAND.soft}\">Marque fictive · démo portfolio</text>\n</svg>`;\n}\n\nfunction fileItem(path, content, mimeType, json = {}) {\n  const fileName = path.split('/').pop();\n  return { json: { ...json, path }, binary: { data: { data: Buffer.from(content, 'utf8').toString('base64'), mimeType, fileName } } };\n}\n\nfunction linkedinMd(s, p) {\n  return `# LinkedIn — ${s.date} · ${ANGLE_LABELS[s.angle]} (TENSIL)\\n\\n${p.linkedin_text}\\n\\n---\\n${DISCLAIMER}\\n`;\n}\n\nfunction instagramMd(s, p) {\n  return `# Instagram — ${s.date} · ${ANGLE_LABELS[s.angle]} (TENSIL)\\n\\n${p.instagram_caption}\\n\\n${(p.hashtags || []).join(' ')}\\n\\n---\\n${DISCLAIMER}\\n`;\n}\n\nfunction briefOf(s) {\n  return { week_id: s.week_id, theme: s.theme, key_message: s.key_message, product: s.product || null, tone: s.tone, cta: s.cta || null };\n}\n\n// Flat layout: n8n's file node does not create folders, so week/day/angle go in the file name.\nfunction slotPrefix(s) {\n  return `${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${s.angle}`;\n}\n\n// Apply the human decision: approved -> outbox/, rejected -> rejected/ with the reason. Nothing is published.\nconst f = $('Construire les fichiers').first().json;\nconst answer = $input.first().json;\nconst s = f.slot, p = f.post;\nconst approved = String(answer['Décision'] || '').toLowerCase().startsWith('approuv');\nconst reason = String(answer['Motif (si rejet)'] || '').trim() || (approved ? '' : '(non précisé)');\nconst status = approved ? 'approved' : 'rejected';\nconst dir = `${f.base_path}/${approved ? 'outbox' : 'rejected'}/${slotPrefix(s)}`;\nconst decision = {\n  brand: 'TENSIL (marque fictive, démo portfolio)', brief: briefOf(s), date: s.date, angle: s.angle,\n  status, reason: reason || null, review_notes: f.review_notes, decided_at: new Date().toISOString(),\n  execution_id: $execution.id, published: false,\n  note: 'Publication simulée : aucun envoi vers LinkedIn ou Instagram.',\n};\nconst items = [\n  fileItem(`${dir}_linkedin.md`, linkedinMd(s, p), 'text/markdown', { slot_id: s.id, status, reason }),\n  fileItem(`${dir}_instagram_caption.md`, instagramMd(s, p), 'text/markdown'),\n  fileItem(`${dir}_decision.json`, JSON.stringify(decision, null, 2), 'application/json'),\n];\nif (approved) items.push(fileItem(`${dir}_instagram_1080x1350.svg`, f.svg, 'image/svg+xml'));\nreturn items;"
       }
     },
     {
-      "id": "c5d847cd-f203-5673-b0aa-7a7caec712c2",
+      "id": "5012499a-9e19-5ab6-bde8-d7ff270555d5",
       "name": "Écrire la décision",
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        3520,
+        3960,
         100
       ],
       "parameters": {
@@ -606,13 +663,13 @@
       }
     },
     {
-      "id": "0b29969d-7594-5a17-8635-90affd6bd973",
+      "id": "a6e7bad6-8510-5ee4-a4f2-48558d58ed89",
       "name": "Statut final",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "executeOnce": true,
       "position": [
-        3740,
+        4180,
         100
       ],
       "parameters": {
@@ -620,7 +677,7 @@
         "operation": "update",
         "dataTableId": {
           "mode": "id",
-          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+          "value": "REPLACE_WITH_tensil_slots_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -679,7 +736,7 @@
       }
     },
     {
-      "id": "4816e35d-709b-50aa-8dcc-c7cabed58f30",
+      "id": "2a076083-7bca-5a60-ac0d-2f907b40fab6",
       "name": "Préparer l'erreur",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -688,11 +745,11 @@
         420
       ],
       "parameters": {
-        "jsCode": "const ANGLES = ['chiffre', 'astuce', 'coulisses', 'question', 'produit'];\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst BRAND = { navy: '#1B3A4B', amber: '#F2A541', cream: '#F6EFE6', name: 'CAFÉ LUMEN' };\nconst LABELS = { chiffre: 'LE CHIFFRE', astuce: 'ASTUCE', coulisses: 'COULISSES', question: 'ET VOUS ?', produit: 'NOUVEAUTÉ' };\n\nfunction esc(s) {\n  return String(s ?? '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&apos;' }[c]));\n}\n\nfunction wrap(text, max) {\n  const lines = [];\n  let cur = '';\n  for (const w of String(text ?? '').split(/\\s+/).filter(Boolean)) {\n    if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }\n    else cur = (cur + ' ' + w).trim();\n  }\n  if (cur) lines.push(cur);\n  return lines;\n}\n\nfunction renderSvg(angle, visual) {\n  const W = 1080, H = 1350;\n  const big = angle === 'chiffre';\n  const size = big ? 170 : 88;\n  const lh = Math.round(size * 1.12);\n  const tLines = wrap(visual.title, big ? 9 : 17).slice(0, 4);\n  const sLines = wrap(visual.subtitle, 32).slice(0, 3);\n  const y0 = big ? 640 : 560;\n  const title = tLines.map((l, i) =>\n    `<text x=\"96\" y=\"${y0 + i * lh}\" font-family=\"Georgia, 'Times New Roman', serif\" font-size=\"${size}\" font-weight=\"700\" fill=\"${BRAND.cream}\">${esc(l)}</text>`).join('\\n');\n  const sy = y0 + tLines.length * lh + 40;\n  const sub = sLines.map((l, i) =>\n    `<text x=\"96\" y=\"${sy + i * 58}\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"44\" fill=\"${BRAND.cream}\" fill-opacity=\"0.85\">${esc(l)}</text>`).join('\\n');\n  return `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${W}\" height=\"${H}\" viewBox=\"0 0 ${W} ${H}\">\n<rect width=\"${W}\" height=\"${H}\" fill=\"${BRAND.navy}\"/>\n<circle cx=\"${W - 60}\" cy=\"140\" r=\"260\" fill=\"${BRAND.amber}\" fill-opacity=\"0.12\"/>\n<rect x=\"96\" y=\"200\" width=\"120\" height=\"12\" fill=\"${BRAND.amber}\"/>\n<text x=\"96\" y=\"300\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"40\" font-weight=\"700\" letter-spacing=\"8\" fill=\"${BRAND.amber}\">${esc(LABELS[angle] || '')}</text>\n${title}\n${sub}\n<rect x=\"0\" y=\"${H - 150}\" width=\"${W}\" height=\"150\" fill=\"${BRAND.amber}\"/>\n<text x=\"96\" y=\"${H - 62}\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"44\" font-weight=\"700\" letter-spacing=\"6\" fill=\"${BRAND.navy}\">${BRAND.name}</text>\n<text x=\"${W - 96}\" y=\"${H - 66}\" text-anchor=\"end\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"26\" fill=\"${BRAND.navy}\">Marque fictive · démo</text>\n</svg>`;\n}\n\nfunction fileItem(path, content, mimeType, json = {}) {\n  const fileName = path.split('/').pop();\n  return { json: { ...json, path }, binary: { data: { data: Buffer.from(content, 'utf8').toString('base64'), mimeType, fileName } } };\n}\n\nfunction linkedinMd(s, c) {\n  return `# LinkedIn — ${s.date} (${s.angle})\\n\\n${c.linkedin_text}\\n`;\n}\n\nfunction instagramMd(s, c) {\n  return `# Instagram — ${s.date} (${s.angle})\\n\\n${c.instagram_caption}\\n\\n${(c.hashtags || []).join(' ')}\\n`;\n}\n\n// Flat layout: n8n's file node does not create folders, so week/day/angle go in the file name.\nfunction slotPrefix(s) {\n  return `${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${s.angle}`;\n}\n\n// Generation failed after retries: keep a trace in _errors/.\nconst it = $input.first().json;\nconst s = it.slot;\nconst err = { week_id: s.week_id, date: s.date, angle: s.angle, mode: it.mode, attempts: it.attempt,\n  errors: it.errors, execution_id: $execution.id, at: new Date().toISOString() };\nreturn [fileItem(`${it.config.base_path}/_errors/${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${$execution.id}.json`,\n  JSON.stringify(err, null, 2), 'application/json', { slot_id: s.id, mode: it.mode, reason: it.errors.join(' ; ') })];"
+        "jsCode": "const ANGLES = ['devoilement', 'anatomie', 'coulisses', 'coloris', 'boutique'];\nconst ANGLE_LABELS = { devoilement: 'Dévoilement', anatomie: 'Anatomie', coulisses: 'Coulisses', coloris: 'Coloris', boutique: 'La boutique' };\nconst DAYS = ['', 'lun', 'mar', 'mer', 'jeu', 'ven'];\n\nconst BRAND = { paper: '#efebe4', sunk: '#e6e1d8', ink: '#171614', soft: '#57534c', signal: '#a8432a', name: 'TENSIL' };\nconst DISPLAY = \"'Archivo Narrow', Archivo, 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif\";\nconst MONO = \"'Azeret Mono', Consolas, 'Courier New', monospace\";\nconst DISCLAIMER = 'Démo portfolio · TENSIL est une marque fictive · contenu préparé pour validation humaine, jamais publié.';\n\nfunction esc(s) {\n  return String(s ?? '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&apos;' }[c]));\n}\n\nfunction wrap(text, max) {\n  const lines = [];\n  let cur = '';\n  for (const w of String(text ?? '').split(/\\s+/).filter(Boolean)) {\n    if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }\n    else cur = (cur + ' ' + w).trim();\n  }\n  if (cur) lines.push(cur);\n  return lines;\n}\n\n// Same number of lines as wrap(), but with lengths evened out (no single word left on the last line).\nfunction balance(text, max) {\n  const n = wrap(text, max).length;\n  for (let m = Math.ceil(String(text ?? '').length / n); m < max; m++) {\n    const lines = wrap(text, m);\n    if (lines.length === n) return lines;\n  }\n  return wrap(text, max);\n}\n\n// 1080x1350 (4:5): Blender render on top (16:9), text block below, in the TENSIL store art direction.\nfunction renderSvg(slot, visual, image, assetName) {\n  const W = 1080, H = 1350, IMG_H = 680, X = 96, BOTTOM = 1176;\n  const big = slot.angle === 'anatomie';\n  const size = big ? 132 : 84;\n  const lh = Math.round(size * 1.04);\n  const tLines = balance(visual.title, big ? 14 : 22).slice(0, big ? 2 : 3);\n  const sLines = balance(visual.subtitle, 50).slice(0, 2);\n  // Text block anchored to the bottom, above the footer rule.\n  const sy = BOTTOM - (sLines.length - 1) * 50;\n  const yLast = sLines.length ? sy - 72 : BOTTOM;\n  const y0 = yLast - (tLines.length - 1) * lh;\n  const labelY = y0 - Math.round(size * 0.85) - 56;\n  const title = tLines.map((l, i) =>\n    `<text x=\"${X}\" y=\"${y0 + i * lh}\" font-family=\"${DISPLAY}\" font-stretch=\"condensed\" font-size=\"${size}\" font-weight=\"700\" fill=\"${BRAND.ink}\">${esc(l)}</text>`).join('\\n');\n  const sub = sLines.map((l, i) =>\n    `<text x=\"${X}\" y=\"${sy + i * 50}\" font-family=\"${DISPLAY}\" font-size=\"38\" fill=\"${BRAND.soft}\">${esc(l)}</text>`).join('\\n');\n  const picture = image\n    ? `<image href=\"${image}\" x=\"0\" y=\"0\" width=\"${W}\" height=\"${IMG_H}\" preserveAspectRatio=\"xMidYMid slice\"/>`\n    : `<rect width=\"${W}\" height=\"${IMG_H}\" fill=\"${BRAND.sunk}\"/>\n<text x=\"${W / 2}\" y=\"${IMG_H / 2}\" text-anchor=\"middle\" font-family=\"${MONO}\" font-size=\"28\" fill=\"${BRAND.soft}\">Rendu indisponible</text>`;\n  return `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${W}\" height=\"${H}\" viewBox=\"0 0 ${W} ${H}\">\n<rect width=\"${W}\" height=\"${H}\" fill=\"${BRAND.paper}\"/>\n${picture}\n<text x=\"${W - X}\" y=\"${IMG_H + 36}\" text-anchor=\"end\" font-family=\"${MONO}\" font-size=\"20\" fill=\"${BRAND.soft}\">Image de synthèse · Blender · ${esc(assetName)}</text>\n<line x1=\"${X}\" y1=\"${labelY - 8}\" x2=\"${X + 56}\" y2=\"${labelY - 8}\" stroke=\"${BRAND.ink}\" stroke-width=\"2\"/>\n<text x=\"${X + 76}\" y=\"${labelY}\" font-family=\"${MONO}\" font-size=\"26\" fill=\"${BRAND.ink}\"><tspan fill=\"${BRAND.signal}\">0${slot.day_index}</tspan>  ${esc(ANGLE_LABELS[slot.angle] || '')}</text>\n${title}\n${sub}\n<line x1=\"${X}\" y1=\"1232\" x2=\"${W - X}\" y2=\"1232\" stroke=\"${BRAND.ink}\" stroke-opacity=\"0.32\" stroke-width=\"2\"/>\n<text x=\"${X}\" y=\"1292\" font-family=\"'Inter', Arial, sans-serif\" font-size=\"40\" font-weight=\"600\" letter-spacing=\"10\" fill=\"${BRAND.ink}\">${BRAND.name}</text>\n<text x=\"${W - X}\" y=\"1288\" text-anchor=\"end\" font-family=\"${MONO}\" font-size=\"20\" fill=\"${BRAND.soft}\">Marque fictive · démo portfolio</text>\n</svg>`;\n}\n\nfunction fileItem(path, content, mimeType, json = {}) {\n  const fileName = path.split('/').pop();\n  return { json: { ...json, path }, binary: { data: { data: Buffer.from(content, 'utf8').toString('base64'), mimeType, fileName } } };\n}\n\nfunction linkedinMd(s, p) {\n  return `# LinkedIn — ${s.date} · ${ANGLE_LABELS[s.angle]} (TENSIL)\\n\\n${p.linkedin_text}\\n\\n---\\n${DISCLAIMER}\\n`;\n}\n\nfunction instagramMd(s, p) {\n  return `# Instagram — ${s.date} · ${ANGLE_LABELS[s.angle]} (TENSIL)\\n\\n${p.instagram_caption}\\n\\n${(p.hashtags || []).join(' ')}\\n\\n---\\n${DISCLAIMER}\\n`;\n}\n\nfunction briefOf(s) {\n  return { week_id: s.week_id, theme: s.theme, key_message: s.key_message, product: s.product || null, tone: s.tone, cta: s.cta || null };\n}\n\n// Flat layout: n8n's file node does not create folders, so week/day/angle go in the file name.\nfunction slotPrefix(s) {\n  return `${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${s.angle}`;\n}\n\n// Generation failed after retries: keep a trace in _errors/.\nconst it = $input.first().json;\nconst s = it.slot;\nconst err = { brand: 'TENSIL (marque fictive, démo portfolio)', brief: briefOf(s), date: s.date, angle: s.angle,\n  mode: it.mode, attempts: it.attempt, errors: it.errors, checks: it.attempts_log, execution_id: $execution.id,\n  at: new Date().toISOString() };\nreturn [fileItem(`${it.config.base_path}/_errors/${s.week_id}_${s.day_index}-${DAYS[s.day_index]}_${$execution.id}.json`,\n  JSON.stringify(err, null, 2), 'application/json', { slot_id: s.id, mode: it.mode, reason: it.errors.join(' ; ') })];"
       }
     },
     {
-      "id": "eeb4ac5d-d425-5851-9e57-85e66d175616",
+      "id": "7d5dc238-e641-5220-a5d1-c38d0ef2f465",
       "name": "Écrire l'erreur",
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
@@ -708,7 +765,7 @@
       }
     },
     {
-      "id": "66ee59fe-0635-5a8f-924d-b5cb8749de71",
+      "id": "f5e85c24-0967-59c7-956b-4a4618685d77",
       "name": "Statut : erreur",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -721,7 +778,7 @@
         "operation": "update",
         "dataTableId": {
           "mode": "id",
-          "value": "REPLACE_WITH_cl_slots_TABLE_ID"
+          "value": "REPLACE_WITH_tensil_slots_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -947,7 +1004,12 @@
       "main": [
         [
           {
-            "node": "Construire les fichiers",
+            "node": "Lire le rendu (GitHub)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Réunir texte + rendu",
             "type": "main",
             "index": 0
           }
@@ -962,6 +1024,28 @@
         [
           {
             "node": "Préparer l'erreur",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire le rendu (GitHub)": {
+      "main": [
+        [
+          {
+            "node": "Réunir texte + rendu",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Réunir texte + rendu": {
+      "main": [
+        [
+          {
+            "node": "Construire les fichiers",
             "type": "main",
             "index": 0
           }
@@ -1061,6 +1145,6 @@
     "executionOrder": "v1"
   },
   "meta": {
-    "note": "Demo portfolio Café Lumen (fictive). No credentials included. Set the data table ID and the error workflow after import."
+    "note": "Demo portfolio TENSIL (fictive brand, nothing is sold or published). No credentials included. Set the data table ID and the error workflow after import."
   }
 }

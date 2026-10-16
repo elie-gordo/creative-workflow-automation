@@ -1,10 +1,10 @@
 {
-  "name": "CL — T · Inspecter les sorties (lecture seule)",
+  "name": "TENSIL — T · Inspecter les sorties (lecture seule)",
   "nodes": [
     {
-      "id": "52ed827f-acc8-5269-8965-7189eb69fee6",
+      "id": "af160dc5-0460-5f52-a230-008223128529",
       "name": "Webhook : inspecter",
-      "webhookId": "5fd02aa1-0245-5868-9190-1bd459b9f01c",
+      "webhookId": "286f639b-cbbc-5330-bf99-daabd8f9202c",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
@@ -13,13 +13,13 @@
       ],
       "parameters": {
         "httpMethod": "GET",
-        "path": "cl-inspect",
+        "path": "tensil-inspect",
         "responseMode": "lastNode",
         "options": {}
       }
     },
     {
-      "id": "c5270736-2613-5a7f-8c83-09d0d6d04258",
+      "id": "60fe14c8-92d7-55ee-a45e-5504bd908fc8",
       "name": "Lire les sorties",
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
@@ -30,12 +30,12 @@
       ],
       "parameters": {
         "operation": "read",
-        "fileSelector": "/home/node/.n8n-files/cafe-lumen/**/*",
+        "fileSelector": "/home/node/.n8n-files/tensil/**/*",
         "options": {}
       }
     },
     {
-      "id": "0ae0e838-b640-5d65-8e1d-8c02b4b3b194",
+      "id": "ce11cf5a-8088-54f6-85e3-1f028f3c7496",
       "name": "Lister",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -76,6 +76,6 @@
     "executionOrder": "v1"
   },
   "meta": {
-    "note": "Demo portfolio Café Lumen (fictive). No credentials included. Set the data table ID and the error workflow after import."
+    "note": "Demo portfolio TENSIL (fictive brand, nothing is sold or published). No credentials included. Set the data table ID and the error workflow after import."
   }
 }

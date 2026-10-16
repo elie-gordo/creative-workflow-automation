@@ -1,0 +1,56 @@
+{
+  "brand": "TENSIL (marque fictive, démo portfolio)",
+  "brief": {
+    "week_id": "2026-W43",
+    "theme": "Semaine de présentation de la lampe TENSIL",
+    "key_message": "Une lampe de bureau articulée, équilibrée par 2 ressorts par segment",
+    "product": "TENSIL Graphite",
+    "tone": "sobre",
+    "cta": "Voir la boutique de démonstration"
+  },
+  "slot": {
+    "date": "2026-10-20",
+    "day": "mar",
+    "angle": "anatomie",
+    "angle_label": "Anatomie"
+  },
+  "status": "to_review",
+  "review_notes": [],
+  "mode": "mock",
+  "prompt_version": "tensil-v1",
+  "attempts": 2,
+  "checks": [
+    {
+      "attempt": 1,
+      "result": "retry",
+      "errors": [
+        "promesse interdite : prix (« € »)",
+        "promesse interdite : vente (« disponible »)",
+        "chiffre absent de la fiche produit : 249"
+      ],
+      "similar_hook": null
+    },
+    {
+      "attempt": 2,
+      "result": "ok",
+      "errors": [],
+      "similar_hook": null
+    }
+  ],
+  "visual": {
+    "file": "2026-W43_2-mar_anatomie_instagram_1080x1350.svg",
+    "title": "2 ressorts",
+    "subtitle": "par segment, pour équilibrer le poids du bras",
+    "render": {
+      "repo": "elie-gordo/blender-studio-object",
+      "ref": "ec74096adb0c2fea723eedd12b1ea9f6c1a26699",
+      "path": "renders/web/03_detail.webp",
+      "embedded": true,
+      "source": "https://github.com/elie-gordo/blender-studio-object/blob/ec74096adb0c2fea723eedd12b1ea9f6c1a26699/renders/web/03_detail.webp"
+    }
+  },
+  "review_url": "https://n8n.example.com/form-waiting/602?signature=REDACTED",
+  "published": false,
+  "execution_id": "602",
+  "generated_at": "2026-10-16T12:13:24.470Z"
+}

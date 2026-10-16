@@ -1,58 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="'Arial Narrow', Arial, sans-serif">
   <defs>
-    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1B3A4B"/></marker>
-    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B5462E"/></marker>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#171614"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#a8432a"/></marker>
     <style>
-      .box{fill:#fff;stroke:#1B3A4B;stroke-width:2}
-      .ai{fill:#F2A541;stroke:#1B3A4B;stroke-width:2}
-      .hum{fill:#1B3A4B}
-      .t{font-size:19px;fill:#1B3A4B;font-weight:700}
-      .s{font-size:14px;fill:#4A5A63}
-      .tw{font-size:19px;fill:#F6EFE6;font-weight:700}
-      .sw{font-size:14px;fill:#F6EFE6;fill-opacity:.85}
-      .lane{font-size:13px;letter-spacing:4px;font-weight:700;fill:#B07A2A}
-      .ln{stroke:#1B3A4B;stroke-width:2;fill:none;marker-end:url(#a)}
-      .er{stroke:#B5462E;stroke-width:2;fill:none;stroke-dasharray:6 5;marker-end:url(#r)}
-      .et{font-size:13px;fill:#B5462E}
+      .box{fill:#f6f3ee;stroke:#171614;stroke-width:2}
+      .ai{fill:#e0714f;stroke:#171614;stroke-width:2}
+      .src{fill:#e6e1d8;stroke:#171614;stroke-width:2;stroke-dasharray:5 4}
+      .hum{fill:#171614}
+      .t{font-size:20px;fill:#171614;font-weight:700}
+      .s{font-size:15px;fill:#57534c}
+      .tw{font-size:20px;fill:#efebe4;font-weight:700}
+      .sw{font-size:15px;fill:#efebe4;fill-opacity:.85}
+      .lane{font-family:Consolas,'Courier New',monospace;font-size:14px;letter-spacing:3px;fill:#a8432a}
+      .ln{stroke:#171614;stroke-width:2;fill:none;marker-end:url(#a)}
+      .er{stroke:#a8432a;stroke-width:2;fill:none;stroke-dasharray:6 5;marker-end:url(#r)}
+      .et{font-size:14px;fill:#a8432a}
     </style>
   </defs>
-  <rect width="1600" height="900" fill="#F6EFE6"/>
-  <text x="60" y="70" font-family="Georgia, serif" font-size="38" font-weight="700" fill="#1B3A4B">Café Lumen — pipeline éditorial n8n</text>
-  <text x="60" y="102" class="s">Marque fictive · 1 idée par semaine → 5 jours × (LinkedIn + Instagram) · validation humaine obligatoire</text>
+  <rect width="1600" height="900" fill="#efebe4"/>
+  <text x="60" y="72" font-size="42" font-weight="700" fill="#171614">TENSIL — préparation d'une campagne avec n8n</text>
+  <text x="60" y="104" class="s">Marque fictive · 1 brief → 5 jours × (LinkedIn + Instagram + visuel) · validation humaine obligatoire · rien n'est publié</text>
 
   <!-- Lane A -->
-  <text x="60" y="160" class="lane">A · PLANIFIER LA SEMAINE (lundi)</text>
-  <rect x="60" y="180" width="230" height="80" rx="10" class="box"/><text x="80" y="214" class="t">Formulaire</text><text x="80" y="238" class="s">idée, message, ton</text>
-  <rect x="340" y="180" width="230" height="80" rx="10" class="box"/><text x="360" y="214" class="t">Valider le brief</text><text x="360" y="238" class="s">règles + semaine en double</text>
-  <rect x="620" y="180" width="260" height="80" rx="10" class="box"/><text x="640" y="214" class="t">5 créneaux</text><text x="640" y="238" class="s">1 angle / jour → Data table</text>
-  <path d="M290 220H336" class="ln"/><path d="M570 220H616" class="ln"/>
-  <path d="M455 260V300" class="er"/><text x="470" y="296" class="et">invalide → page d'erreurs</text>
+  <text x="60" y="160" class="lane">A · PLANIFIER LA SEMAINE</text>
+  <rect x="60" y="180" width="230" height="80" rx="8" class="box"/><text x="80" y="214" class="t">Formulaire brief</text><text x="80" y="238" class="s">thème, message, ton, CTA</text>
+  <rect x="340" y="180" width="290" height="80" rx="8" class="box"/><text x="360" y="214" class="t">Valider le brief</text><text x="360" y="238" class="s">lundi, longueurs, prix, chiffres</text>
+  <rect x="680" y="180" width="330" height="80" rx="8" class="box"/><text x="700" y="214" class="t">5 créneaux → Data table</text><text x="700" y="238" class="s">dévoilement · anatomie · coulisses · coloris · boutique</text>
+  <path d="M290 220H336" class="ln"/><path d="M630 220H676" class="ln"/>
+  <path d="M485 260V300" class="er"/><text x="500" y="296" class="et">refusé → page listant les erreurs, rien n'est écrit</text>
+  <rect x="1100" y="180" width="440" height="80" rx="8" class="src"/><text x="1120" y="214" class="t">Fiche produit (faits confirmés)</text><text x="1120" y="238" class="s">dépôts blender-studio-object + website-redesign</text>
 
   <!-- Lane B -->
-  <text x="60" y="370" class="lane">B · PRODUIRE LE JOUR (lun–ven 8 h)</text>
-  <rect x="60" y="390" width="200" height="80" rx="10" class="box"/><text x="80" y="424" class="t">Créneau du jour</text><text x="80" y="448" class="s">+ accroches passées</text>
-  <rect x="310" y="390" width="200" height="80" rx="10" class="ai"/><text x="330" y="424" class="t">Étape IA</text><text x="330" y="448" class="s" fill="#1B3A4B">JSON · mock | OpenAI</text>
-  <rect x="560" y="390" width="230" height="80" rx="10" class="box"/><text x="580" y="424" class="t">Contrôles</text><text x="580" y="448" class="s">format, longueurs, répétition</text>
-  <rect x="840" y="390" width="210" height="80" rx="10" class="box"/><text x="860" y="424" class="t">Visuel SVG</text><text x="860" y="448" class="s">1080×1350, 5 gabarits</text>
-  <rect x="1100" y="390" width="200" height="80" rx="10" class="box"/><text x="1120" y="424" class="t">Fichiers</text><text x="1120" y="448" class="s">output/ · to_review</text>
-  <rect x="1350" y="390" width="200" height="80" rx="10" class="hum"/><text x="1370" y="424" class="tw">Validation</text><text x="1370" y="448" class="sw">humaine (formulaire)</text>
-  <path d="M260 430H306" class="ln"/><path d="M510 430H556" class="ln"/><path d="M790 430H836" class="ln"/><path d="M1050 430H1096" class="ln"/><path d="M1300 430H1346" class="ln"/>
-  <path d="M610 470C610 525 410 525 410 474" class="er"/><text x="300" y="545" class="et">invalide ou répétée → 1 nouvel essai</text>
-  <path d="M740 470V600" class="er"/><text x="755" y="540" class="et">échec après nouvel essai</text>
+  <text x="60" y="370" class="lane">B · PRODUIRE LE JOUR</text>
+  <rect x="60" y="390" width="190" height="80" rx="8" class="box"/><text x="80" y="424" class="t">Créneau du jour</text><text x="80" y="448" class="s">+ accroches passées</text>
+  <rect x="290" y="390" width="190" height="80" rx="8" class="ai"/><text x="310" y="424" class="t">Étape IA</text><text x="310" y="448" class="s" fill="#171614">JSON · mock | OpenAI</text>
+  <rect x="520" y="390" width="230" height="80" rx="8" class="box"/><text x="540" y="418" class="t">Contrôles</text><text x="540" y="441" class="s">format, longueurs, promesses,</text><text x="540" y="459" class="s">chiffres, répétition</text>
+  <rect x="790" y="390" width="230" height="80" rx="8" class="box"/><text x="810" y="424" class="t">Visuel 1080×1350</text><text x="810" y="448" class="s">SVG + rendu Blender</text>
+  <rect x="1060" y="390" width="190" height="80" rx="8" class="box"/><text x="1080" y="424" class="t">Fichiers</text><text x="1080" y="448" class="s">output/ · to_review</text>
+  <rect x="1290" y="390" width="250" height="80" rx="8" class="hum"/><text x="1310" y="424" class="tw">Validation humaine</text><text x="1310" y="448" class="sw">formulaire : approuver / rejeter</text>
+  <path d="M250 430H286" class="ln"/><path d="M480 430H516" class="ln"/><path d="M750 430H786" class="ln"/><path d="M1020 430H1056" class="ln"/><path d="M1250 430H1286" class="ln"/>
+  <path d="M1320 260C1320 320 385 320 385 386" class="ln" stroke-dasharray="3 4"/><text x="700" y="364" class="s">fiche injectée dans le prompt et dans les contrôles</text>
+  <rect x="790" y="530" width="230" height="64" rx="8" class="src"/><text x="810" y="558" class="t">Rendus Blender</text><text x="810" y="580" class="s">GitHub, commit épinglé</text>
+  <path d="M905 530V474" class="ln"/>
+  <path d="M600 470C600 525 385 525 385 474" class="er"/><text x="300" y="548" class="et">refusé ou répété → 1 nouvel essai</text>
+  <path d="M690 470V620" class="er"/><text x="705" y="612" class="et">échec</text>
 
   <!-- outcomes -->
-  <rect x="1200" y="560" width="160" height="70" rx="10" class="box"/><text x="1220" y="592" class="t">outbox/</text><text x="1220" y="614" class="s">approuvé</text>
-  <rect x="1390" y="560" width="160" height="70" rx="10" class="box"/><text x="1410" y="592" class="t">rejected/</text><text x="1410" y="614" class="s">+ motif</text>
-  <path d="M1420 470C1420 520 1280 520 1280 556" class="ln"/><path d="M1470 470V556" class="ln"/>
-  <rect x="625" y="604" width="230" height="70" rx="10" class="box" stroke="#B5462E"/><text x="645" y="636" class="t" fill="#B5462E">_errors/</text><text x="645" y="658" class="s">statut error + trace</text>
+  <rect x="1180" y="560" width="160" height="70" rx="8" class="box"/><text x="1200" y="592" class="t">outbox/</text><text x="1200" y="614" class="s">approuvé</text>
+  <rect x="1380" y="560" width="160" height="70" rx="8" class="box"/><text x="1400" y="592" class="t">rejected/</text><text x="1400" y="614" class="s">+ motif</text>
+  <path d="M1360 470C1360 520 1260 520 1260 556" class="ln"/><path d="M1460 470V556" class="ln"/>
+  <rect x="575" y="624" width="230" height="70" rx="8" class="box" stroke="#a8432a"/><text x="595" y="656" class="t" fill="#a8432a">_errors/</text><text x="595" y="678" class="s">statut error + trace</text>
 
   <!-- Lane E -->
-  <text x="60" y="700" class="lane">E · ERREURS (toute panne imprévue)</text>
-  <rect x="60" y="720" width="260" height="70" rx="10" class="box"/><text x="80" y="752" class="t">Error Trigger</text><text x="80" y="774" class="s">→ trace dans _errors/</text>
+  <text x="60" y="740" class="lane">E · ERREURS IMPRÉVUES</text>
+  <rect x="60" y="760" width="300" height="70" rx="8" class="box"/><text x="80" y="792" class="t">Error Trigger</text><text x="80" y="814" class="s">→ _errors/workflow_&lt;id&gt;.json</text>
+  <text x="400" y="740" class="lane">T · INSPECTER</text>
+  <rect x="400" y="760" width="300" height="70" rx="8" class="box"/><text x="420" y="792" class="t">Webhook GET</text><text x="420" y="814" class="s">liste les fichiers produits</text>
 
   <!-- legend -->
-  <rect x="900" y="725" width="22" height="22" rx="4" class="ai"/><text x="932" y="742" class="s">seule étape IA</text>
-  <rect x="1060" y="725" width="22" height="22" rx="4" class="hum"/><text x="1092" y="742" class="s">action humaine</text>
-  <path d="M1240 736H1290" class="er"/><text x="1300" y="742" class="s">chemin d'erreur</text>
-  <text x="900" y="790" class="s">Publication LinkedIn / Instagram : simulée (outbox/) · aucune notification envoyée · 0 € en mode démo</text>
+  <rect x="900" y="745" width="22" height="22" rx="4" class="ai"/><text x="932" y="762" class="s">seule étape IA</text>
+  <rect x="1060" y="745" width="22" height="22" rx="4" class="hum"/><text x="1092" y="762" class="s">action humaine</text>
+  <rect x="1220" y="745" width="22" height="22" rx="4" class="src"/><text x="1252" y="762" class="s">source existante</text>
+  <path d="M1390 756H1440" class="er"/><text x="1450" y="762" class="s">erreur</text>
+  <text x="900" y="810" class="s">Publication LinkedIn / Instagram : simulée (outbox/) · aucune notification · 0 € en mode démo</text>
 </svg>

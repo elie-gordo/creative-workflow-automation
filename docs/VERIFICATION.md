@@ -1,37 +1,45 @@
 # Vérifications
 
-Instance : n8n **2.43.6** auto-hébergé (Docker), accessible par réseau privé Tailscale.
-Méthode : `scripts/e2e_tests.py` pilote les vrais formulaires et webhooks, puis lit la Data table `cl_slots`, les exécutions (API publique n8n) et les fichiers produits (workflow T).
-Mode : **mock** uniquement. Dernier passage : 2026-10-16, **17/17 contrôles réussis**.
+Deux niveaux de tests, tous deux exécutés le 2026-10-16.
 
-## Scénarios réellement exécutés
+## 1. Tests hors ligne : 57/57
+`python scripts/build_workflows.py && node scripts/offline_tests.mjs`
+
+Le script exécute le **JavaScript réel** des nœuds Code (extrait des workflows générés) avec des variables n8n simulées (`$input`, `$`, `$execution`, `$now`). Aucune instance n8n n'est nécessaire.
+
+| Domaine | Ce qui est vérifié |
+|---|---|
+| Brief (A) | brief TENSIL accepté ; refus d'une date hors lundi, d'un ton inconnu, d'un thème trop court, d'un prix, d'une vente, d'une livraison, d'un chiffre hors fiche ; plan de 5 créneaux ; semaine en double refusée |
+| Génération (B) | les 5 angles passent au 1er essai, avec le bon rendu et la fiche produit dans le prompt ; scénarios `claim`, `invalid_once`, `invalid_json`, `repeat` ; même angle la semaine suivante → nouvelle accroche |
+| Rejets | LED, chiffre inventé (« 1,2 kg »), « à la main », superlatif, hashtag invalide, texte trop long, titre d'anatomie sans chiffre |
+| Fichiers | 4 fichiers par jour, SVG avec le rendu intégré, `meta.json` complet, mention « marque fictive », chemins à plat ; rendu indisponible → `needs_review` |
+| Décision et erreur | approuvé → `outbox/` avec SVG ; rejeté → `rejected/` avec motif ; échec → `_errors/` avec brief et contrôles |
+
+Ce test a révélé un défaut, corrigé avant le déploiement : les nombres décimaux étaient découpés (« 1,2 » lu comme « 1 » et « 2 », deux nombres autorisés).
+
+## 2. Tests de bout en bout : 23/23
+`python scripts/e2e_tests.py` sur n8n **2.43.6** auto-hébergé (Docker), joignable par réseau privé Tailscale, en mode **mock**. Le script pilote les vrais formulaires et webhooks, puis lit la Data table, les exécutions (API n8n) et les fichiers (workflow T).
 
 | # | Scénario | Attendu | Résultat |
 |---|---|---|---|
-| 1 | Brief invalide (mardi, thème de 5 caractères, ton inconnu) | page « Brief refusé » listant 3 erreurs, aucune ligne créée | ✅ |
-| 2 | Brief valide (semaine 2026-W43) | 5 créneaux `planned`, accents conservés | ✅ |
-| 3 | Même semaine soumise une deuxième fois | refus « déjà planifiée », toujours 5 lignes | ✅ |
-| 4 | Lundi, réponse IA valide | fichiers dans `output/`, statut `to_review`, lien de validation enregistré | ✅ |
-| 5 | Mardi, réponse invalide puis valide (`invalid_once`) | 2e essai, puis `to_review` | ✅ (attempt = 2) |
-| 6 | Mercredi, réponse toujours invalide (`invalid_json`) | 2 essais, statut `error`, trace dans `_errors/` | ✅ |
-| 7 | Jeudi, accroche identique à celle du lundi (`repeat`) | répétition détectée, 2e essai, puis `needs_review` | ✅ |
-| 8 | Vendredi rejeté avec motif via le formulaire de validation | statut `rejected`, motif enregistré, fichiers dans `rejected/` | ✅ |
-| 9 | Lundi approuvé via le formulaire de validation | statut `approved`, fichiers + SVG dans `outbox/` | ✅ |
-| 10 | Date sans créneau (samedi) | arrêt propre sur « Rien à produire » | ✅ |
-| 11 | Présence de 7 fichiers clés (output, outbox, rejected, _errors) | fichiers listés par le workflow T | ✅ |
+| 1 | Brief invalide (mardi, thème de 5 caractères, ton inconnu, « En vente à 249 € avec livraison offerte ») | page « Brief refusé » listant les erreurs, aucune ligne créée | ✅ |
+| 2 | Brief TENSIL valide (2026-W43) | 5 créneaux `planned`, un angle par jour, accents conservés | ✅ |
+| 3 | Même semaine soumise à nouveau | refus « déjà planifiée » | ✅ |
+| 4 | Lundi dévoilement, réponse valide | `to_review`, lien de validation enregistré | ✅ |
+| 5 | Mardi anatomie, `claim` (promesse « disponible à 249 € ») | 3 motifs relevés au 1er essai (prix, vente, chiffre), 2e essai propre, `to_review` | ✅ |
+| 6 | Mercredi coulisses, `invalid_json` | 2 essais, statut `error`, trace dans `_errors/` | ✅ |
+| 7 | Jeudi coloris, `repeat` (accroche du lundi) | répétition détectée, `needs_review` | ✅ |
+| 8 | Vendredi boutique rejeté avec motif | `rejected`, motif enregistré, fichiers dans `rejected/` | ✅ |
+| 9 | Lundi approuvé | `approved`, textes et visuel dans `outbox/` | ✅ |
+| 10 | Samedi, aucun créneau | arrêt propre sur « Rien à produire » | ✅ |
+| 11 | Semaine 2026-W44, lundi `invalid_once` | 2e essai, accroche différente de la semaine 43 | ✅ |
+| 12 | Workflow temporaire qui lève une exception, avec E comme workflow d'erreur | E écrit `_errors/workflow_<id>.json`, puis le workflow temporaire est supprimé | ✅ |
+| 13 | Fichiers clés (output, outbox, rejected, _errors), 4 visuels avec le rendu intégré, `meta.json` du mardi (2 contrôles, rendu épinglé, `published: false`), post approuvé sans « € » et avec la mention « marque fictive » | présents et conformes | ✅ (11 contrôles) |
 
-Les 4 visuels SVG produits ont été rendus en PNG (Chrome headless) et contrôlés visuellement : [docs/img/](img/).
+Les fichiers de ce passage sont dans [examples/](../examples/). Les visuels produits ont été convertis en PNG (Chrome headless) et contrôlés à l'œil : [docs/img/](img/). Le visuel du mercredi (coulisses) provient d'une production réelle sur la semaine 2026-W44, le mercredi de la semaine 43 servant au scénario d'erreur.
+
+### Fait établi pendant les tests
+Dans n8n 2.43.6, un workflow d'erreur **non publié** ne se déclenche pas : l'exécution en panne 581 n'a produit aucune exécution de E. Une fois E publié, l'exécution 582 a déclenché E (583, succès). Le déploiement publie donc E.
 
 ## Recherche de secrets
-
-Recherche dans tout le dépôt (hors `.git`) des motifs : jeton n8n (`eyJhbGci`), clé OpenAI (`sk-…`), nom d'hôte Tailscale (`*.ts.net`), signatures d'URL. **Aucune occurrence.** Dans `examples/`, les liens de validation ont été remplacés par `https://n8n.example.com/…?signature=REDACTED`. Les exports de workflows ne contiennent aucune credential ; l'identifiant de la Data table est remplacé par `REPLACE_WITH_cl_slots_TABLE_ID`.
-
-## Non vérifié
-
-| Élément | Raison |
-|---|---|
-| Mode `live` (OpenAI) | aucune credential configurée pour l'instant ; le nœud HTTP et le schéma JSON n'ont été qu'inspectés |
-| Workflow E (exception non gérée) | aucune panne imprévue provoquée ; les erreurs prévues passent par le chemin d'erreur de B (testé). E n'est pas « publié » dans n8n 2.x : à confirmer qu'un workflow d'erreur non publié se déclenche bien |
-| Déclencheur planifié 8 h | volontairement désactivé ; testé uniquement par le webhook à date forcée |
-| Rendu dans un vrai navigateur des formulaires | soumis par HTTP (multipart) ; seule la page de fin de A a été lue en HTML |
-| Import manuel des JSON exportés dans une instance vierge | déploiement fait par l'API ; l'import par l'interface n'a pas été rejoué |
+Recherche dans le dépôt (hors `.git` et `.env`) des motifs : jeton n8n (`eyJhbGci`), clé OpenAI (`sk-…`), nom d'hôte Tailscale (`*.ts.net`), signatures d'URL, identifiants de table et de workflows de l'instance. **Aucune occurrence**, en dehors d'un exemple générique d'URL en commentaire et du motif de masquage lui-même. Dans `examples/`, les liens de validation sont remplacés par `https://n8n.example.com/…?signature=REDACTED`. Les exports ne contiennent aucune credential ; l'identifiant de la Data table est remplacé par `REPLACE_WITH_tensil_slots_TABLE_ID`.

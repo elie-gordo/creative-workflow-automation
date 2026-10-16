@@ -1,0 +1,54 @@
+{
+  "brand": "TENSIL (marque fictive, démo portfolio)",
+  "brief": {
+    "week_id": "2026-W43",
+    "theme": "Semaine de présentation de la lampe TENSIL",
+    "key_message": "Une lampe de bureau articulée, équilibrée par 2 ressorts par segment",
+    "product": "TENSIL Graphite",
+    "tone": "sobre",
+    "cta": "Voir la boutique de démonstration"
+  },
+  "slot": {
+    "date": "2026-10-22",
+    "day": "jeu",
+    "angle": "coloris",
+    "angle_label": "Coloris"
+  },
+  "status": "needs_review",
+  "review_notes": [
+    "accroche proche de : « TENSIL : une lampe de bureau qui équilibre son propre bras »"
+  ],
+  "mode": "mock",
+  "prompt_version": "tensil-v1",
+  "attempts": 2,
+  "checks": [
+    {
+      "attempt": 1,
+      "result": "retry",
+      "errors": [],
+      "similar_hook": "TENSIL : une lampe de bureau qui équilibre son propre bras"
+    },
+    {
+      "attempt": 2,
+      "result": "ok",
+      "errors": [],
+      "similar_hook": "TENSIL : une lampe de bureau qui équilibre son propre bras"
+    }
+  ],
+  "visual": {
+    "file": "2026-W43_4-jeu_coloris_instagram_1080x1350.svg",
+    "title": "Laquelle choisiriez-vous ?",
+    "subtitle": "Graphite, Sauge, Oxyde, Crème",
+    "render": {
+      "repo": "elie-gordo/blender-studio-object",
+      "ref": "ec74096adb0c2fea723eedd12b1ea9f6c1a26699",
+      "path": "renders/web/colorways_test.webp",
+      "embedded": true,
+      "source": "https://github.com/elie-gordo/blender-studio-object/blob/ec74096adb0c2fea723eedd12b1ea9f6c1a26699/renders/web/colorways_test.webp"
+    }
+  },
+  "review_url": "https://n8n.example.com/form-waiting/604?signature=REDACTED",
+  "published": false,
+  "execution_id": "604",
+  "generated_at": "2026-10-16T12:13:27.812Z"
+}

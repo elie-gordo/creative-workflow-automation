@@ -1,136 +1,61 @@
-# Architecture et faisabilité gratuite (étape 3)
+# Architecture
 
-> Statut : **étude réalisée le 2026-10-15 — décision prise, voir ci-dessous.**
+## Vue d'ensemble
 
-## Décision retenue (2026-10-15)
+```
+                ┌──────────── serveur personnel (Docker, n8n 2.43.6) ─────────────┐
+ Navigateur ─Tailscale─► n8n ──► Data table tensil_slots (plan, statuts, textes)    │
+ (formulaires,  │         ├──► ~/.n8n-files/tensil/{output,outbox,rejected,_errors} │
+  validation)   │         ├──► api.github.com ─► rendus Blender (commit épinglé)   │
+                │         └──► api.openai.com [live] ou mock intégré               │
+                └─────────────────────────────────────────────────────────────────┘
+ Poste de travail ─API n8n─► scripts/build_workflows.py (déploiement, export)
+                           └► scripts/e2e_tests.py (scénarios de bout en bout)
+```
 
-- **Hébergement** : n8n auto-hébergé sur un serveur personnel existant (Docker, n8n 2.43.6), accessible uniquement par réseau privé **Tailscale**, avec HTTPS fourni par `tailscale serve`. Pas de domaine, pas de cloud public, 0 € supplémentaire.
-- **IA** : mode **mock** par défaut ; mode **live** via l'API **OpenAI** (`gpt-4o-mini`) avec une credential n8n, pas encore activé.
-- **Stockage** : Data table n8n `cl_slots` (planning, statuts, textes) et fichiers sous `~/.n8n-files/cafe-lumen/`.
-- Les options comparées ci-dessous (Oracle, Google Cloud, n8n Cloud, Groq, Gemini, Mistral) restent documentées pour qui veut reproduire la démo sans serveur personnel.
-> Vérifications faites le 2026-10-15 sur les sources officielles listées en bas. Les offres gratuites peuvent changer sans préavis.
-> Légende : ✅ vérifié (source officielle) · ⚠️ vérifié mais ambigu / contradictoire · ❓ non vérifié
+- **Hébergement** : n8n auto-hébergé sur un serveur personnel (Docker), accessible uniquement par réseau privé **Tailscale**, HTTPS fourni par `tailscale serve`. Pas de domaine, pas de cloud public.
+- **IA** : mode **mock** par défaut ; mode **live** via l'API **OpenAI** (`gpt-4o-mini`) avec une credential n8n.
+- **Stockage** : Data table `tensil_slots` et fichiers sous `~/.n8n-files/tensil/`.
+- **Visuels** : rendus Blender existants, lus par l'API GitHub publique à un commit fixé, intégrés en base64 dans le SVG. Aucune génération d'image.
 
-## 1. Constat clé
+## Workflows
 
-La démo du portfolio **n'a pas besoin d'un serveur allumé 24 h/24** pour être convaincante :
-- le workflow est livré en **export JSON** importable dans n'importe quel n8n ;
-- le déclencheur quotidien est démontrable avec un **déclenchement manuel à date forcée** ;
-- les preuves (captures, sorties, éventuellement vidéo) sont dans le dépôt.
-
-L'hébergement cloud permanent est donc un **plus**, pas une condition de réussite. Cela réduit fortement le risque lié aux offres gratuites.
-
-## 2. Hébergement de n8n — comparaison
-
-| Critère | Oracle Always Free (A1 Arm) | Google Cloud Free Tier (e2-micro) | n8n Cloud |
+| Workflow | Nœuds | Déclencheur | Rôle |
 |---|---|---|---|
-| Ressources | ✅ 2 OCPU, 12 Go RAM (total), 200 Go disque | ✅ 1 e2-micro (❓ RAM exacte non lue), 30 Go disque | géré |
-| Durée | ✅ « Always Free », sans durée annoncée — pas une garantie à vie | ✅ Free Tier sans durée annoncée | ✅ essai : 1 000 exécutions, durée non indiquée |
-| Carte bancaire | ✅ demandée pour la plupart des comptes, autorisation de 1 USD, pas de débit sans passage en payant | ✅ compte de facturation obligatoire | ✅ pas de carte pour l'essai |
-| Disponibilité | ⚠️ erreurs « out of host capacity » possibles à la création | ✅ régions US uniquement | ✅ |
-| Récupération pour inactivité | ⚠️ instance **récupérable si inactive 7 jours** : CPU p95 < 20 %, réseau < 20 % **et** mémoire < 20 % (A1). Un n8n peu sollicité peut entrer dans ces seuils. Compte inactif 30 jours : suspension possible | ❓ | — |
-| Trafic sortant | ✅ 10 To/mois | ✅ 1 Go/mois (suffisant pour du texte) | — |
-| Sauvegardes | ✅ 5 sauvegardes de volume gratuites | ❓ | gérées |
-| HTTPS / webhooks | à configurer : reverse proxy + domaine, ou tunnel | idem | ✅ inclus |
-| Modules npm dans le nœud Code | ✅ possible (auto-hébergé) | ✅ possible | ✅ non autorisé — sans impact ici (SVG pur) |
-| Coût pérenne | 0 € tant que l'offre existe | 0 € tant que l'offre existe | ✅ Starter **20 €/mois facturé à l'année = 240 €/an** → dépasse le budget global |
+| A · Planifier la semaine | 8 | formulaire `tensil-brief` | valide le brief (règles, promesses, chiffres), refuse une semaine en double, crée 5 créneaux |
+| B · Produire le jour | 26 | 8 h en semaine (désactivé) + webhook `tensil-produire` | prompt avec fiche produit → IA (mock ou OpenAI) → contrôles → nouvel essai → rendu GitHub → fichiers → validation humaine → classement |
+| E · Erreurs | 3 | Error Trigger (publié : n8n 2.x l'exige) | trace JSON dans `_errors/` |
+| T · Inspecter | 3 | webhook GET `tensil-inspect` | liste des fichiers, lecture seule |
 
-**Recommandation 💡** : **Oracle A1** comme cible, à condition que tu acceptes la vérification par carte. Contre la récupération pour inactivité : surveiller les métriques après déploiement ; option possible : passer le compte en « Pay As You Go » (✅ les ressources Always Free restent gratuites ; ❓ effet exact sur la règle d'inactivité non confirmé). Google Cloud = solution de repli. n8n Cloud = uniquement pour tourner une vidéo de démo pendant l'essai, pas pour l'hébergement durable.
+## Choix et compromis
+- **Le code n8n est généré** par `scripts/build_workflows.py`, une seule source pour le déploiement et l'export. Les nœuds Code sont testés hors ligne (`scripts/offline_tests.mjs`).
+- **Fiche produit dans le code** : les faits sont recopiés des dépôts [blender-studio-object](https://github.com/elie-gordo/blender-studio-object) et [website-redesign](https://github.com/elie-gordo/website-redesign). S'ils évoluent, `PRODUCT_FACTS` est à mettre à jour.
+- **Rendus lus sur GitHub** plutôt que copiés sur le serveur : aucun fichier à installer, provenance traçable dans `meta.json` ; en contrepartie, une dépendance réseau et la limite anonyme de 60 requêtes par heure.
+- **Une seule étape IA**, isolée derrière un schéma JSON : changer de fournisseur compatible OpenAI revient à changer l'URL et le modèle du nœud HTTP.
+- **Deux nœuds de fusion par position** : un pour la réponse OpenAI (mode live), un pour le rendu.
 
-### HTTPS et accès public (nécessaire pour les formulaires n8n)
+## Contraintes n8n prises en compte
+- **Licence** : Sustainable Use License, **source disponible, pas open source**. Usage interne, personnel ou non commercial autorisé ; revendre l'hébergement de n8n n'est pas couvert. Une démo portfolio auto-hébergée sur données fictives est compatible.
+- **Fichiers** : en v2, les nœuds de lecture/écriture n'accèdent par défaut qu'à `~/.n8n-files` (`N8N_RESTRICT_FILE_ACCESS_TO`) et ne créent pas de dossiers ; Execute Command est désactivé. D'où les dossiers créés à l'installation et les noms de fichiers à plat.
+- **Data tables** : stockage interne (limite par défaut 200 Mio), lu et écrit par le nœud Data Table, pas par le nœud Code.
+- **Workflow d'erreur** : ne se déclenche que s'il est publié.
+- **Clé de chiffrement** (`N8N_ENCRYPTION_KEY`) : chiffre les credentials en base ; à sauvegarder hors du dépôt.
+- **URL publique** : `N8N_WEBHOOK_URL` à partir de n8n 2.30.0, `WEBHOOK_URL` avant.
 
-| Option | Domaine | Coût | Remarque |
-|---|---|---|---|
-| Reverse proxy (Caddy ou Traefik) + certificat Let's Encrypt | oui, pointé sur l'IP de la VM | domaine payant ❓ (≈ 10 €/an, à vérifier) ou sous-domaine gratuit ❓ | ports 80/443 à ouvrir dans le pare-feu Oracle (liste de sécurité + pare-feu de la VM) |
-| Cloudflare Tunnel nommé | ✅ domaine géré chez Cloudflare requis | ✅ disponible sur tous les plans | aucun port entrant à ouvrir |
-| Cloudflare Quick Tunnel | ✅ aucun compte ni domaine | 0 € | ✅ URL aléatoire et temporaire — dépannage seulement |
-
-Opérations manuelles nécessaires (de ta part) : création du compte cloud, vérification carte/téléphone, éventuel domaine.
-
-## 3. n8n — points vérifiés impactant la conception
-
-- ✅ **Licence** : Sustainable Use License, **source disponible, pas open source**. Autorise l'usage « pour vos propres besoins internes » ou « non commercial ou personnel ». Redistribution permise seulement gratuitement et à des fins non commerciales. Les fichiers `.ee.` (fonctions Enterprise) nécessitent une licence Enterprise.
-  - Démo portfolio auto-hébergée, données fictives : usage personnel/non commercial → **compatible**.
-  - Vendre l'hébergement de n8n à des clients : **non couvert** par cette licence.
-  - ❓ Le cas « je construis des workflows pour un client qui héberge son propre n8n » n'est pas tranché par le texte lu ; à vérifier avant toute mission réelle.
-- ✅ **n8n v2** : les nœuds de lecture/écriture de fichiers n'accèdent par défaut qu'à `~/.n8n-files` (`N8N_RESTRICT_FILE_ACCESS_TO`) ; le nœud Execute Command est désactivé par défaut. → Sorties écrites sous `~/.n8n-files/`, aucune commande système utilisée.
-- ✅ **Data tables** : stockage interne, limite par défaut 200 Mio (⚠️ ancienne doc : 50 Mo). Largement suffisant pour plan + historique. Le nœud Code ne lit pas une Data table directement → passer par le nœud Data Table.
-- ✅ **Clé de chiffrement** (`N8N_ENCRYPTION_KEY`) : chiffre les credentials en base ; à sauvegarder hors du dépôt.
-- ✅ **Mémoire** : 320 Mo – 2 Go selon les workflows.
-- ⚠️ URL publique : `N8N_WEBHOOK_URL` à partir de n8n 2.30.0, `WEBHOOK_URL` avant.
-
-## 4. Étape IA — comparaison
-
-| Option | Coût | Limites | Données | Compatibilité |
-|---|---|---|---|---|
-| **Mock** (réponses fixes dans `fixtures/`) | 0 € | aucune | aucune donnée envoyée | — |
-| Google Gemini (offre gratuite) | ✅ gratuit sur les modèles Flash / Flash-Lite | ⚠️ quotas visibles seulement dans AI Studio, « non garantis » | ⚠️ **en gratuit, le contenu sert à améliorer les produits Google** | ✅ point d'accès compatible OpenAI, sortie JSON structurée |
-| Groq (offre gratuite) | ✅ gratuit | ⚠️ ex. `openai/gpt-oss-20b` : 30 req/min, 1 000 req/jour, 200 k tokens/jour (plan non explicitement indiqué dans le tableau) | ✅ pas de conservation des requêtes par défaut (journaux d'abus ≤ 30 jours) | ✅ compatible OpenAI (`https://api.groq.com/openai/v1`) |
-| Mistral (mode gratuit) | ✅ gratuit, sans carte | ❓ chiffres visibles seulement en console | ⚠️ « pas d'entraînement sur les données API » — application au gratuit non confirmée | ❓ |
-
-Besoin réel : 1 appel par jour (+1 en cas de nouvel essai), quelques centaines de tokens → **toutes les offres gratuites suffisent largement**.
-
-**Recommandation 💡** : **mock par défaut** + **Groq** en mode live (gratuit, compatible OpenAI, pas de conservation par défaut). Gemini en alternative. Appel via un **nœud HTTP Request** au format OpenAI : changer de fournisseur = changer `LLM_BASE_URL` et `LLM_MODEL`. Clé stockée dans une credential n8n, jamais dans le dépôt.
-
-## 5. Contraintes des plateformes (pour la validation par code)
-
-| Règle | Valeur | Source |
+## Contraintes des plateformes
+| Règle | Valeur | Limite interne du workflow |
 |---|---|---|
-| Post LinkedIn | ✅ 3 000 caractères max | aide LinkedIn |
-| Légende Instagram | ✅ 2 200 caractères max | doc Graph API |
-| Hashtags Instagram | ✅ 30 max | aide Instagram + Graph API |
-| Format d'image Instagram | ✅ ratio entre 4:5 et 1,91:1, largeur 1080 px, hauteur jusqu'à 1350 px | aide Instagram |
+| Post LinkedIn | 3 000 caractères max | 100–1 300 |
+| Légende Instagram | 2 200 caractères max | 50–600 |
+| Hashtags Instagram | 30 max | 3–8 |
+| Format d'image Instagram | ratio entre 4:5 et 1,91:1, largeur 1080 px, hauteur jusqu'à 1350 px | 1080 × 1350 (4:5) |
 
-→ Le visuel **1080 × 1350 (4:5)** prévu au brief est conforme. Les limites internes du workflow seront plus strictes (posts courts) ; ces maxima servent de garde-fou.
-
-## 6. Architecture proposée
-
-```
-                 ┌──────────────── VM Oracle A1 (Docker Compose) ────────────────┐
- Navigateur ─HTTPS─► Reverse proxy ──► n8n ──► Data tables (plan, historique)    │
- (formulaires)   │                      ├──► ~/.n8n-files/output/… (posts, SVG)  │
-                 │                      └──► HTTP Request ─► LLM (Groq) [live]   │
-                 │                                 ou fixtures/ [mock]           │
-                 └───────────────────────────────────────────────────────────────┘
-```
-
-Aucun déploiement sans ton accord.
-
-## 7. Coûts
-
-| Poste | Option gratuite | Type | Solution pérenne payante (estimation) |
-|---|---|---|---|
-| Hébergement n8n | Oracle Always Free : 0 € | mensuel | ❓ petite VM payante, quelques €/mois — à chiffrer si besoin ; n8n Cloud Starter 240 €/an (✅) |
-| Domaine | Quick Tunnel / sous-domaine gratuit ❓ | annuel | ❓ ≈ 10 €/an selon l'extension, à vérifier |
-| IA | mock ou offre gratuite : 0 € | à l'usage | ❓ quelques centimes/mois au volume prévu, à chiffrer si passage en payant |
-| Certificat HTTPS | Let's Encrypt / Cloudflare : 0 € | — | — |
-| **Total visé** | **0 €** | | |
-
-Offres soumises à conditions : crédit d'essai Oracle (300 USD, 30 jours — non utilisé ici), essai n8n Cloud (1 000 exécutions), quotas gratuits IA révisables à tout moment.
-
-## Sources officielles consultées
-
+## Sources
 - n8n — licence : https://github.com/n8n-io/n8n/blob/master/LICENSE.md
-- n8n — tarifs : https://n8n.io/pricing/
 - n8n — changements v2.0 : https://docs.n8n.io/2-0-breaking-changes/
 - n8n — nœud Read/Write Files : https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.readwritefile
-- n8n — modules dans le nœud Code : https://docs.n8n.io/hosting/configuration/configuration-examples/modules-in-code-node/
 - n8n — Data tables : https://docs.n8n.io/data/data-tables/
-- n8n — Docker Compose : https://docs.n8n.io/hosting/installation/server-setups/docker-compose/
-- Oracle — ressources Always Free : https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm
-- Oracle — FAQ Free Tier : https://www.oracle.com/cloud/free/faq/
-- Oracle — inscription : https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/signingup_topic-Sign_Up_for_Free_Oracle_Cloud_Promotion.htm
-- Google Cloud — Free Tier : https://docs.cloud.google.com/free/docs/free-cloud-features
-- Gemini API — tarifs : https://ai.google.dev/gemini-api/docs/pricing
-- Gemini API — quotas : https://ai.google.dev/gemini-api/docs/rate-limits
-- Gemini API — compatibilité OpenAI : https://ai.google.dev/gemini-api/docs/openai
-- Groq — quotas : https://console.groq.com/docs/rate-limits
-- Groq — compatibilité OpenAI : https://console.groq.com/docs/openai
-- Groq — données : https://console.groq.com/docs/your-data
-- Mistral — limites : https://docs.mistral.ai/admin/user-management-finops/tier
-- Mistral — inférence : https://mistral.ai/cloud/inference/
-- Cloudflare Tunnel : https://developers.cloudflare.com/tunnel/
-- Cloudflare Quick Tunnels : https://try.cloudflare.com/
+- GitHub — API Contents : https://docs.github.com/en/rest/repos/contents
 - LinkedIn — publier : https://www.linkedin.com/help/linkedin/answer/a528176
 - Instagram — résolution d'image : https://help.instagram.com/1631821640426723/
 - Instagram Graph API — IG User Media : https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media
